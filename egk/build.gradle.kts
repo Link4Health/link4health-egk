@@ -66,7 +66,6 @@ android {
 }
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
     api(libs.bcprov.jdk18on)
     api(libs.bcpkix.jdk18on)
 
