@@ -1,0 +1,53 @@
+[versions]
+dependencyCheckGradle = "9.0.8"
+gradleLicenseReport = "2.5"
+sonarqubeGradlePlugin = "5.0.0.4638"
+detekt = "1.23.4"
+jacoco = "0.8.11"
+dokka = "1.9.20"
+agp = "8.2.0"
+
+compileSdk = "34"
+minSDK = "30"
+targetSdk = "34"
+javaTarget = "17"
+
+## Egk API Android section start
+nameSpaceEgkiAndroid = "de.link4health.egk"
+libraryPackageNameEgkAndroid = "de.link4health.egk.api"
+majorEgkAndroid = "0"
+minorEgkAndroid = "1"
+patchEgkAndroid = "0"
+## Egk API Android section end
+
+kotlin = "2.0.0"
+
+junit = "4.13.2"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+
+bcpkixJdk18on = "1.78.1"
+
+slf4j-android = "1.7.36"
+
+[libraries]
+dependency-check-gradle = { module = "org.owasp:dependency-check-gradle", version.ref = "dependencyCheckGradle" }
+gradle-license-report = { module = "com.github.jk1:gradle-license-report", version.ref = "gradleLicenseReport" }
+
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+
+
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+
+bcpkix-jdk18on = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bcpkixJdk18on" }
+bcprov-jdk18on = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bcpkixJdk18on" }
+
+[plugins]
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+
+dokka-documentation = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+sonarqube = { id = "org.sonarqube", version.ref = "sonarqubeGradlePlugin" }
+dedekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
