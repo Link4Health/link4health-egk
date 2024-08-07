@@ -1,0 +1,44 @@
+# Top-most EditorConfig file
+root = true
+
+# Kotlin files
+[*.kt]
+charset = utf-8
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+
+# .Kts files
+[*.kts]
+charset = utf-8
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+
+# XML files
+[*.xml]
+charset = utf-8
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+
+# Groovy files
+[*.groovy]
+charset = utf-8
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+
+# Properties files
+[*.properties]
+charset = utf-8
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+
+# JSON files
+[*.json]
+charset = utf-8
+indent_style = space
+indent_size = 4
+insert_final_newline = true
