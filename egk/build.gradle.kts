@@ -6,6 +6,9 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.dokka.documentation)
+    alias(libs.plugins.dedekt)
+    alias(libs.plugins.sonarqube)
+    alias(libs.plugins.dependency.check.gradle)
     id("jacoco")
     `maven-publish`
 }

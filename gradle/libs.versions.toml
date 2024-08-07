@@ -1,6 +1,5 @@
 [versions]
-dependencyCheckGradle = "9.0.8"
-gradleLicenseReport = "2.5"
+dependencyCheckGradle = "10.0.2"
 sonarqubeGradlePlugin = "5.0.0.4638"
 detekt = "1.23.4"
 jacoco = "0.8.11"
@@ -31,8 +30,6 @@ bcpkixJdk18on = "1.78.1"
 slf4j-android = "1.7.36"
 
 [libraries]
-dependency-check-gradle = { module = "org.owasp:dependency-check-gradle", version.ref = "dependencyCheckGradle" }
-gradle-license-report = { module = "com.github.jk1:gradle-license-report", version.ref = "gradleLicenseReport" }
 
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
@@ -51,3 +48,4 @@ kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 dokka-documentation = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 sonarqube = { id = "org.sonarqube", version.ref = "sonarqubeGradlePlugin" }
 dedekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+dependency-check-gradle = { id = "org.owasp.dependencycheck", version.ref = "dependencyCheckGradle" }
