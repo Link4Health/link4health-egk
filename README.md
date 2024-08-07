@@ -38,8 +38,17 @@ javaTarget = "17"
 
 ### Adding Dependencies to Your Application
 
-At the moment is not available over Maven Central, you can use the composite build feature from Gradle or build the library as aar and 
-paste the artifact in your libs folder in your Android App.
+At the moment is not available over Maven Central, you can use the composite build feature from Gradle or build the library as aar
+To provide the link4health-eGK-library to your mavenLocal repository, you must run these Gradle tasks:
+
+Run this task first:
+
+```./gradlew assembleRelease```
+
+Run this task second:
+
+```./gradlew publishLink4HealthEgkLibraryPublicationToMavenLocal```
+
 
 ### Proguard or R8 setup
 
