@@ -9,12 +9,42 @@ plugins {
     alias(libs.plugins.dedekt)
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.dependency.check.gradle)
-    id("jacoco")
+    alias(libs.plugins.gradle.license.report)
+    jacoco
     `maven-publish`
 }
 
 jacoco {
     toolVersion = libs.versions.jacoco.get()
+}
+licenseReport {
+    // By default this plugin will collect the union of all licenses from
+    // the immediate pom and the parent poms. If your legal team thinks this
+    // is too liberal, you can restrict collected licenses to only include the
+    // those found in the immediate pom file
+    // Defaults to: true
+    unionParentPomLicenses = false
+
+    // Set output directory for the report data.
+    // Defaults to ${project.buildDir}/reports/dependency-license.
+    outputDir = project.layout.buildDirectory.dir("licenses").get().asFile.path
+
+    // Adjust the configurations to fetch dependencies. Default is 'runtimeClasspath'
+    // For Android projects use 'releaseRuntimeClasspath' or 'yourFlavorNameReleaseRuntimeClasspath'
+    // Use 'ALL' to dynamically resolve all configurations:
+    // configurations = ALL
+    configurations = arrayOf("releaseRuntimeClasspath")
+
+    // Don't include artifacts of project's own group into the report
+    excludeOwnGroup = true
+
+    // Don't exclude bom dependencies.
+    // If set to true, then all boms will be excluded from the report
+    excludeBoms = false
+
+    // This is for the allowed-licenses-file in checkLicense Task
+    // Accepts File, URL or String path to local or remote file
+    allowedLicensesFile = project.layout.projectDirectory.file("config/allowed-licenses.json").asFile
 }
 
 val injectVariable: MutableMap<String, String> = System.getenv()

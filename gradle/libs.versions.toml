@@ -1,5 +1,6 @@
 [versions]
 dependencyCheckGradle = "10.0.2"
+gradleLicenseReport = "2.8"
 sonarqubeGradlePlugin = "5.0.0.4638"
 detekt = "1.23.4"
 jacoco = "0.8.11"
@@ -47,3 +48,4 @@ dokka-documentation = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 sonarqube = { id = "org.sonarqube", version.ref = "sonarqubeGradlePlugin" }
 dedekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dependency-check-gradle = { id = "org.owasp.dependencycheck", version.ref = "dependencyCheckGradle" }
+gradle-license-report = { id = "com.github.jk1.dependency-license-report", version.ref = "gradleLicenseReport" }
