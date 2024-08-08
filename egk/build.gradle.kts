@@ -29,6 +29,10 @@ licenseReport {
     // Defaults to ${project.buildDir}/reports/dependency-license.
     outputDir = "${rootProject.projectDir}/docs/licenses"
 
+    // Select projects to examine for dependencies.
+    // Defaults to current project and all its subprojects
+    projects = arrayOf(project) + project.subprojects
+
     // Adjust the configurations to fetch dependencies. Default is 'runtimeClasspath'
     // For Android projects use 'releaseRuntimeClasspath' or 'yourFlavorNameReleaseRuntimeClasspath'
     // Use 'ALL' to dynamically resolve all configurations:
