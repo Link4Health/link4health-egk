@@ -27,7 +27,7 @@ licenseReport {
 
     // Set output directory for the report data.
     // Defaults to ${project.buildDir}/reports/dependency-license.
-    outputDir = project.layout.buildDirectory.dir("licenses").get().asFile.path
+    outputDir = "${rootProject.projectDir}/docs/licenses"
 
     // Adjust the configurations to fetch dependencies. Default is 'runtimeClasspath'
     // For Android projects use 'releaseRuntimeClasspath' or 'yourFlavorNameReleaseRuntimeClasspath'
