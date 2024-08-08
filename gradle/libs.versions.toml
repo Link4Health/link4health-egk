@@ -27,8 +27,6 @@ espressoCore = "3.6.1"
 
 bcpkixJdk18on = "1.78.1"
 
-slf4j-android = "1.7.36"
-
 [libraries]
 
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
