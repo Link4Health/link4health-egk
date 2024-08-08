@@ -42,9 +42,8 @@ class EncryptedPinFormat2(pin: String) {
     /**
      * Represents a byte array.
      *
-     * @sample HealthCardCommand.Companion.verifyPin
      *
-     * @see HealthCardCommand
+     * @see [de.link4health.egk.command.HealthCardCommand]
      */
     val bytes: ByteArray get() = field.copyOf()
 
