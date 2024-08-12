@@ -1,0 +1,17 @@
+{
+    "allowedLicenses": [
+        "Apache-2.0",
+        "MIT",
+        "BSD-3-Clause",
+        "BSD-2-Clause",
+        "GPL-3.0-or-later",
+        "EUPL-1.2"
+    ],
+    "disallowedLicenses": [
+        "GPL-2.0-only",
+        "AGPL-3.0-only"
+    ],
+    "config": {
+        "failOnUnknown": true
+    }
+}

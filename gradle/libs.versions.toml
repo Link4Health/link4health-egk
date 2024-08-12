@@ -1,6 +1,7 @@
 [versions]
 dependencyCheckGradle = "10.0.2"
-sonarqubeGradlePlugin = "5.0.0.4638"
+gradleLicenseReport = "2.8"
+sonarqubeGradlePlugin = "5.1.0.4882"
 detekt = "1.23.4"
 jacoco = "0.8.11"
 dokka = "1.9.20"
@@ -14,8 +15,8 @@ javaTarget = "17"
 ## Egk API Android section start
 nameSpaceEgkiAndroid = "de.link4health.egk"
 libraryPackageNameEgkAndroid = "de.link4health.egk.api"
-majorEgkAndroid = "0"
-minorEgkAndroid = "1"
+majorEgkAndroid = "1"
+minorEgkAndroid = "0"
 patchEgkAndroid = "0"
 ## Egk API Android section end
 
@@ -47,3 +48,4 @@ dokka-documentation = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 sonarqube = { id = "org.sonarqube", version.ref = "sonarqubeGradlePlugin" }
 dedekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dependency-check-gradle = { id = "org.owasp.dependencycheck", version.ref = "dependencyCheckGradle" }
+gradle-license-report = { id = "com.github.jk1.dependency-license-report", version.ref = "gradleLicenseReport" }

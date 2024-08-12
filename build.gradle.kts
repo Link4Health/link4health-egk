@@ -6,4 +6,5 @@ plugins {
     alias(libs.plugins.dokka.documentation) apply false
     alias(libs.plugins.sonarqube) apply false
     alias(libs.plugins.dependency.check.gradle) apply false
+    alias(libs.plugins.gradle.license.report) apply false
 }
