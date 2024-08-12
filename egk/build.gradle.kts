@@ -103,6 +103,8 @@ dependencies {
     api(libs.bcprov.jdk18on)
     api(libs.bcpkix.jdk18on)
 
+    api(libs.napier)
+
     testImplementation(libs.junit)
     testImplementation(libs.kotlin.test)
     androidTestImplementation(libs.androidx.junit)
