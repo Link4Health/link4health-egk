@@ -236,7 +236,6 @@ val changeReferenceDataStatus = mapOf(
  * @see ResponseStatus.SUCCESS
  * @see ResponseStatus.SECURITY_STATUS_NOT_SATISFIED
  *
- * @sample getRandomValuesStatus
  */
 val getRandomValuesStatus = mapOf(
     0x9000 to ResponseStatus.SUCCESS,
