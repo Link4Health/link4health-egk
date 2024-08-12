@@ -22,6 +22,8 @@ patchEgkAndroid = "0"
 
 kotlin = "2.0.0"
 
+napier = "2.7.1"
+
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -32,6 +34,7 @@ bcpkixJdk18on = "1.78.1"
 
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
+napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
