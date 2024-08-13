@@ -25,7 +25,7 @@ import de.link4health.egk.command.CommandApdu
 import de.link4health.egk.command.ResponseApdu
 import io.github.aakira.napier.Napier
 
-class NfcCardSecureChannel internal constructor(
+class NfcCardSecureChannel(
     override val isExtendedLengthSupported: Boolean,
     private val nfcHealthCard: NfcHealthCard,
     paceKey: PaceKey
