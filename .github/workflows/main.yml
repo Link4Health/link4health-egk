@@ -53,6 +53,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: egk/build/outputs/aar/*.aar
+          asset_path: egk/build/outputs/aar/link4health-egk-library-${{ env.MAJOR_EGK_API_VERSION }}.${{ env.MINOR_EGK_API_VERSION }}.${{ env.PATCH_EGK_API_VERSION }}-${{ env.SHORT_SHA }}.aar
           asset_name: link4health-egk-library-${{ env.MAJOR_EGK_API_VERSION }}.${{ env.MINOR_EGK_API_VERSION }}.${{ env.PATCH_EGK_API_VERSION }}-#${{ github.run_number }}-${{ env.SHORT_SHA }}
           asset_content_type: application/zip
