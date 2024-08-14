@@ -148,3 +148,7 @@ publishing {
         }
     }
 }
+
+tasks.named("publishLink4HealthEgkLibraryPublicationToMavenLocal") {
+    dependsOn(tasks.named("bundleReleaseAar"))
+}
