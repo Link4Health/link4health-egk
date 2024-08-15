@@ -1,5 +1,5 @@
 [versions]
-dependencyCheckGradle = "10.0.2"
+dependencyCheckGradle = "10.0.3"
 gradleLicenseReport = "2.8"
 sonarqubeGradlePlugin = "5.1.0.4882"
 detekt = "1.23.4"
