@@ -17,6 +17,14 @@ plugins {
 jacoco {
     toolVersion = libs.versions.jacoco.get()
 }
+val nvdApiKey: String? by extra
+dependencyCheck {
+    autoUpdate = true
+    analyzedTypes = listOf("jar, aar")
+    outputDirectory = "${rootProject.projectDir}/docs/owasp-dependency-check"
+    format = "HTML"
+    nvd.apiKey = nvdApiKey
+}
 licenseReport {
     // By default this plugin will collect the union of all licenses from
     // the immediate pom and the parent poms. If your legal team thinks this
