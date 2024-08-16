@@ -157,6 +157,14 @@ publishing {
     }
 }
 
-tasks.named("publishLink4HealthEgkLibraryPublicationToMavenLocal") {
-    dependsOn(tasks.named("bundleReleaseAar"))
+afterEvaluate {
+    tasks.named("publishLink4HealthEgkLibraryPublicationToMavenLocal") {
+        dependsOn("clean")
+        mustRunAfter("clean")
+        dependsOn("bundleReleaseAar")
+    }
+
+    tasks.named("bundleReleaseAar") {
+        mustRunAfter("clean")
+    }
 }
