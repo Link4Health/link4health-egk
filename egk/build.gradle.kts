@@ -25,6 +25,23 @@ dependencyCheck {
     format = "HTML"
     nvd.apiKey = nvdApiKey
 }
+
+tasks.dokkaHtml {
+    outputDirectory.set(File("${rootProject.projectDir}/docs/javaDoc/"))
+}
+
+tasks.register<Jar>("dokkaHtmlJar") {
+    dependsOn(tasks.dokkaHtml)
+    from(tasks.dokkaHtml.flatMap { it.outputDirectory })
+    archiveClassifier.set("html-docs")
+}
+
+tasks.register<Jar>("dokkaJavadocJar") {
+    dependsOn(tasks.dokkaJavadoc)
+    from(tasks.dokkaJavadoc.flatMap { it.outputDirectory })
+    archiveClassifier.set("javadoc")
+}
+
 licenseReport {
     // By default this plugin will collect the union of all licenses from
     // the immediate pom and the parent poms. If your legal team thinks this
