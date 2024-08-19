@@ -37,6 +37,12 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
+      - name: Set up Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Store secret in gradle.properties
+        run: echo "nvdApiKey=${{ secrets.NVD_API_KEY }}" >> $HOME/.gradle/gradle.properties
+
       - name: Generate Dokka Documentation
         run: ./gradlew dokkaHtml
 
