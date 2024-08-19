@@ -88,3 +88,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 ### Information
 This product uses the NVD API but is not endorsed or certified by the NVD.
+
+### GitHub Pages
+
+You can find the GitHub Page for this project here: [link4health-egk-library](https://link4health.github.io/link4health-egk-library/)
