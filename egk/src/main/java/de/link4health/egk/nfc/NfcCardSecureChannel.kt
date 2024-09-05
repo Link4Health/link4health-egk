@@ -18,6 +18,7 @@
 
 package de.link4health.egk.nfc
 
+import de.link4health.egk.card.BLOCK_SIZE
 import de.link4health.egk.card.ICardChannel
 import de.link4health.egk.card.PaceKey
 import de.link4health.egk.card.SecureMessaging
@@ -30,7 +31,7 @@ class NfcCardSecureChannel(
     private val nfcHealthCard: NfcHealthCard,
     paceKey: PaceKey
 ) : ICardChannel {
-    private var secureMessaging = SecureMessaging(paceKey)
+    private var secureMessaging = SecureMessaging(paceKey, ByteArray(BLOCK_SIZE))
 
     override val card: NfcHealthCard get() = nfcHealthCard
 

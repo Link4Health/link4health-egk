@@ -18,18 +18,31 @@
 
 package de.link4health.egk.exchange
 
-import android.os.Build
 import de.link4health.egk.Bytes
 import de.link4health.egk.CardUtilities.byteArrayToECPoint
 import de.link4health.egk.CardUtilities.extractKeyObjectEncoded
 import de.link4health.egk.Requirement
+import de.link4health.egk.card.CardKey
+import de.link4health.egk.card.HealthCardVersion2
+import de.link4health.egk.card.ICardChannel
+import de.link4health.egk.card.PaceKey
+import de.link4health.egk.card.isEGK21
 import de.link4health.egk.cardobjects.Ef
+import de.link4health.egk.command.HealthCardCommand
+import de.link4health.egk.command.executeSuccessfulOn
+import de.link4health.egk.command.generalAuthenticate
+import de.link4health.egk.command.manageSecEnvWithoutCurves
+import de.link4health.egk.command.read
+import de.link4health.egk.command.select
 import de.link4health.egk.exchange.KeyDerivationFunction.getAES128Key
 import de.link4health.egk.identifier.FileIdentifier
 import de.link4health.egk.identifier.ShortFileIdentifier
-import de.link4health.egk.card.*
-import de.link4health.egk.command.*
-import org.bouncycastle.asn1.*
+import org.bouncycastle.asn1.ASN1EncodableVector
+import org.bouncycastle.asn1.ASN1ObjectIdentifier
+import org.bouncycastle.asn1.BERTags
+import org.bouncycastle.asn1.DEROctetString
+import org.bouncycastle.asn1.DERSequence
+import org.bouncycastle.asn1.DERTaggedObject
 import org.bouncycastle.crypto.engines.AESEngine
 import org.bouncycastle.crypto.macs.CMac
 import org.bouncycastle.crypto.params.KeyParameter
@@ -50,11 +63,7 @@ private const val TAG_49 = 0x49
  * pcd = smartphone
  */
 suspend fun ICardChannel.establishTrustedChannel(cardAccessNumber: String): PaceKey {
-    val randomGenerator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        SecureRandom.getInstanceStrong()
-    } else {
-        SecureRandom()
-    }
+    val randomGenerator = SecureRandom.getInstanceStrong()
 
     /**
      * Reads the supported PACE parameters from the card and performs the necessary steps to establish a trusted channel.

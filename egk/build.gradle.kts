@@ -13,10 +13,95 @@ plugins {
     jacoco
     `maven-publish`
 }
-
+detekt {
+    val configDir = "${project.layout.projectDirectory.asFile.absolutePath}/config/detekt"
+    toolVersion = libs.versions.detekt.get()
+    config.setFrom(files("${configDir}/detekt.yml"))
+    // Optional: Define which directories should be scanned. If unspecified, detekt will scan all kotlin sources.
+    source.from(
+        files(
+            "src/main/kotlin",
+            "src/main/java",
+            "src/test/kotlin",
+            "src/test/java"
+        )
+    )
+    // Build upon the default configuration provided by Detekt
+    buildUponDefaultConfig = true
+    // Optional: By default, Detekt does not fail the build when issues are found. Set this to true to fail the build.
+    ignoreFailures = false
+    // Optional: If set to true, ignores all rules in the baseline XML.
+    baseline = file("${configDir}/detekt-baseline.xml")
+}
 jacoco {
     toolVersion = libs.versions.jacoco.get()
 }
+
+tasks.withType<Test> {
+    extensions.configure(JacocoTaskExtension::class) {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
+    }
+}
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    group = "verification"
+    dependsOn("testDebugUnitTest") // Ensure the report is generated after tests run
+
+    reports {
+        xml.required.set(false)
+        html.required.set(true)
+    }
+
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R\$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "android/**/*.*"
+    )
+    val mainSrc = "${project.projectDir}/src/main/java"
+
+    val javaClasses = fileTree(layout.buildDirectory.dir("intermediates/javac/debug/classes")) {
+        exclude(fileFilter)
+    }
+
+    val kotlinClasses = fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
+        exclude(fileFilter)
+    }
+
+    val combinedClasses = files(javaClasses, kotlinClasses)
+
+    classDirectories.setFrom(combinedClasses)
+    sourceDirectories.setFrom(files(mainSrc))
+    executionData.setFrom(fileTree(layout.buildDirectory).include("jacoco/testDebugUnitTest.exec"))
+}
+
+val nvdApiKey: String? by extra
+dependencyCheck {
+    autoUpdate = true
+    analyzedTypes = listOf("jar, aar")
+    outputDirectory = "${rootProject.projectDir}/docs/owasp-dependency-check"
+    format = "HTML"
+    nvd.apiKey = nvdApiKey
+}
+
+tasks.dokkaHtml {
+    outputDirectory.set(File("${rootProject.projectDir}/docs/javaDoc/"))
+}
+
+tasks.register<Jar>("dokkaHtmlJar") {
+    dependsOn(tasks.dokkaHtml)
+    from(tasks.dokkaHtml.flatMap { it.outputDirectory })
+    archiveClassifier.set("html-docs")
+}
+
+tasks.register<Jar>("dokkaJavadocJar") {
+    dependsOn(tasks.dokkaJavadoc)
+    from(tasks.dokkaJavadoc.flatMap { it.outputDirectory })
+    archiveClassifier.set("javadoc")
+}
+
 licenseReport {
     // By default this plugin will collect the union of all licenses from
     // the immediate pom and the parent poms. If your legal team thinks this
@@ -100,6 +185,9 @@ android {
 }
 
 dependencies {
+
+    implementation(libs.snakeyaml)
+    implementation(libs.kotlinx.coroutines.core)
     api(libs.bcprov.jdk18on)
     api(libs.bcpkix.jdk18on)
 
@@ -107,6 +195,7 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlin.test)
+    testImplementation(libs.mockk)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
@@ -146,5 +235,17 @@ publishing {
                 }
             }
         }
+    }
+}
+
+afterEvaluate {
+    tasks.named("publishLink4HealthEgkLibraryPublicationToMavenLocal") {
+        dependsOn("clean")
+        mustRunAfter("clean")
+        dependsOn("bundleReleaseAar")
+    }
+
+    tasks.named("bundleReleaseAar") {
+        mustRunAfter("clean")
     }
 }

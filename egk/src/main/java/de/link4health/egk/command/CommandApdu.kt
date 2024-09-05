@@ -7,16 +7,22 @@ import java.io.ByteArrayOutputStream
  */
 const val EXPECTED_LENGTH_WILDCARD_EXTENDED: Int = 65536
 const val EXPECTED_LENGTH_WILDCARD_SHORT: Int = 256
+const val BYTE_MASK: Int = 0xFF
+const val BYTE_SHIFT: Int = 8
+const val MAX_APDU_HEADER_VALUE: Int = 255
+const val MAX_APDU_DATA_LENGTH: Int = 65535
+const val DATA_OFFSET_SHORT: Int = 5
+const val DATA_OFFSET_EXTENDED: Int = 7
 
 private fun encodeDataLengthExtended(nc: Int): ByteArray =
-    byteArrayOf(0x0, (nc shr 8).toByte(), (nc and 0xFF).toByte())
+    byteArrayOf(0x0, (nc shr BYTE_SHIFT).toByte(), (nc and BYTE_MASK).toByte())
 
 private fun encodeDataLengthShort(nc: Int): ByteArray =
     byteArrayOf(nc.toByte())
 
 private fun encodeExpectedLengthExtended(ne: Int): ByteArray =
-    if (ne != EXPECTED_LENGTH_WILDCARD_EXTENDED) { // == 65536
-        byteArrayOf((ne shr 8).toByte(), (ne and 0xFF).toByte()) // l1, l2
+    if (ne != EXPECTED_LENGTH_WILDCARD_EXTENDED) {
+        byteArrayOf((ne shr BYTE_SHIFT).toByte(), (ne and BYTE_MASK).toByte())
     } else {
         byteArrayOf(0x0, 0x0)
     }
@@ -32,6 +38,7 @@ private fun encodeExpectedLengthShort(ne: Int): ByteArray =
 
 /**
  * An APDU (Application Protocol Data Unit) Command per ISO/IEC 7816-4.
+ *
  * Command APDU encoding options:
  *
  * ```
@@ -119,12 +126,12 @@ class CommandApdu(
             require(!(cla < 0 || ins < 0 || p1 < 0 || p2 < 0)) {
                 "APDU header fields must not be less than 0"
             }
-            require(!(cla > 0xFF || ins > 0xFF || p1 > 0xFF || p2 > 0xFF)) {
-                "APDU header fields must not be greater than 255 (0xFF)"
+            require(!(cla > MAX_APDU_HEADER_VALUE || ins > MAX_APDU_HEADER_VALUE || p1 > MAX_APDU_HEADER_VALUE || p2 > MAX_APDU_HEADER_VALUE)) {
+                "APDU header fields must not be greater than $MAX_APDU_HEADER_VALUE (0xFF)"
             }
             ne?.let {
                 require(ne <= EXPECTED_LENGTH_WILDCARD_EXTENDED || ne >= 0) {
-                    "APDU response length is out of bounds [0, 65536]"
+                    "APDU response length is out of bounds [0, $EXPECTED_LENGTH_WILDCARD_EXTENDED]"
                 }
             }
 
@@ -134,22 +141,22 @@ class CommandApdu(
 
             return if (data != null) {
                 val nc = data.size
-                require(nc <= 65535) { "ADPU cmd data length must not exceed 65535 bytes" }
+                require(nc <= MAX_APDU_DATA_LENGTH) { "ADPU cmd data length must not exceed $MAX_APDU_DATA_LENGTH bytes" }
 
                 val dataOffset: Int
                 val le: Int? // le1, le2
                 if (ne != null) {
                     le = ne
                     // case 4s or 4e
-                    if (nc <= 255 && ne <= EXPECTED_LENGTH_WILDCARD_SHORT) {
+                    if (nc <= MAX_APDU_HEADER_VALUE && ne <= EXPECTED_LENGTH_WILDCARD_SHORT) {
                         // case 4s
-                        dataOffset = 5
+                        dataOffset = DATA_OFFSET_SHORT
                         bytes.write(encodeDataLengthShort(nc))
                         bytes.write(data)
                         bytes.write(encodeExpectedLengthShort(ne))
                     } else {
                         // case 4e
-                        dataOffset = 7
+                        dataOffset = DATA_OFFSET_EXTENDED
                         bytes.write(encodeDataLengthExtended(nc))
                         bytes.write(data)
                         bytes.write(encodeExpectedLengthExtended(ne))
@@ -157,13 +164,13 @@ class CommandApdu(
                 } else {
                     // case 3s or 3e
                     le = null
-                    if (nc <= 255) {
+                    if (nc <= MAX_APDU_HEADER_VALUE) {
                         // case 3s
-                        dataOffset = 5
+                        dataOffset = DATA_OFFSET_SHORT
                         bytes.write(encodeDataLengthShort(nc))
                     } else {
                         // case 3e
-                        dataOffset = 7
+                        dataOffset = DATA_OFFSET_EXTENDED
                         bytes.write(encodeDataLengthExtended(nc))
                     }
                     bytes.write(data)

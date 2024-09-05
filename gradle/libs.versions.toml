@@ -1,11 +1,14 @@
 [versions]
-dependencyCheckGradle = "10.0.2"
+dependencyCheckGradle = "10.0.3"
 gradleLicenseReport = "2.8"
+kotlinxCoroutinesCore = "1.8.0"
+mockk = "1.13.5"
+snakeyaml = "2.3"
 sonarqubeGradlePlugin = "5.1.0.4882"
 detekt = "1.23.4"
 jacoco = "0.8.11"
 dokka = "1.9.20"
-agp = "8.2.0"
+agp = "8.2.2"
 
 compileSdk = "34"
 minSDK = "30"
@@ -17,7 +20,7 @@ nameSpaceEgkiAndroid = "de.link4health.egk"
 libraryPackageNameEgkAndroid = "de.link4health.egk.api"
 majorEgkAndroid = "1"
 minorEgkAndroid = "0"
-patchEgkAndroid = "0"
+patchEgkAndroid = "1"
 ## Egk API Android section end
 
 kotlin = "2.0.0"
@@ -34,6 +37,8 @@ bcpkixJdk18on = "1.78.1"
 
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -42,6 +47,7 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 
 bcpkix-jdk18on = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bcpkixJdk18on" }
 bcprov-jdk18on = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bcpkixJdk18on" }
+snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
 
 [plugins]
 androidLibrary = { id = "com.android.library", version.ref = "agp" }

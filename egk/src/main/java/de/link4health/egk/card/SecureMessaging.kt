@@ -18,6 +18,7 @@
 
 package de.link4health.egk.card
 
+import de.link4health.egk.BCProvider
 import de.link4health.egk.Bytes.padData
 import de.link4health.egk.Bytes.unPadData
 import de.link4health.egk.command.CommandApdu
@@ -44,7 +45,7 @@ import kotlin.experimental.or
 
 private const val SECURE_MESSAGING_COMMAND = 0x0C.toByte()
 private val PADDING_INDICATOR = byteArrayOf(0x01.toByte())
-private const val BLOCK_SIZE = 16
+const val BLOCK_SIZE = 16
 private const val MAC_SIZE = 8
 private const val STATUS_SIZE: Int = 0x02
 private const val MIN_RESPONSE_SIZE = 12
@@ -63,7 +64,7 @@ private const val MALFORMED_SECURE_MESSAGING_APDU = "Malformed Secure Messaging 
  *
  * @param paceKey The PaceKey for the secure messaging session.
  */
-class SecureMessaging(private val paceKey: PaceKey) {
+class SecureMessaging(private val paceKey: PaceKey, private val ecbIv: ByteArray) {
     private val secureMessagingSSC: ByteArray = ByteArray(BLOCK_SIZE)
 
     private fun incrementSSC() {
@@ -270,9 +271,9 @@ class SecureMessaging(private val paceKey: PaceKey) {
         dataBytes.copyOfRange(1, dataBytes.size)
 
     private fun getCipher(mode: Int): Cipher =
-        Cipher.getInstance("AES/CBC/NoPadding", de.link4health.egk.BCProvider).apply {
+        Cipher.getInstance("AES/CBC/NoPadding", BCProvider).apply {
             val key: Key = SecretKeySpec(paceKey.enc, "AES")
-            val iv = createCipherIV()
+            val iv = createCipherIV()  // Hier verwenden Sie SSC als IV
             val aps: AlgorithmParameterSpec = IvParameterSpec(iv)
 
             init(mode, key, aps)
@@ -280,15 +281,22 @@ class SecureMessaging(private val paceKey: PaceKey) {
 
     private fun createCipherIV(): ByteArray =
         // ECB instead of CBC on purpose. COS doesn't support CBC for this.
-        Cipher.getInstance("AES/ECB/NoPadding", de.link4health.egk.BCProvider).let {
+        Cipher.getInstance("AES/CBC/NoPadding", BCProvider).let {
             val key: Key = SecretKeySpec(paceKey.enc, "AES")
-            it.init(ENCRYPT_MODE, key)
+            val aps: AlgorithmParameterSpec = IvParameterSpec(ecbIv)
+            it.init(ENCRYPT_MODE, key, aps)
             it.doFinal(secureMessagingSSC)
         }
+//    private fun createCipherIV(): ByteArray =
+//        // ECB instead of CBC on purpose. COS doesn't support CBC for this.
+//        Cipher.getInstance("AES/ECB/NoPadding", BCProvider).let {
+//            val key: Key = SecretKeySpec(paceKey.enc, "AES")
+//            it.init(ENCRYPT_MODE, key)
+//            it.doFinal(secureMessagingSSC)
+//        }
 }
 
 private fun InputStream.readAndCheckExpectedLength(b: ByteArray, expected: Int) {
     val l = this.read(b, 0, expected)
     require(l == expected) { MALFORMED_SECURE_MESSAGING_APDU }
 }
-

@@ -42,7 +42,7 @@ class ApplicationIdentifier(val aid: ByteArray) {
      * @throws IllegalArgumentException if the length of the hexAid is invalid
      */
     constructor(hexAid: String) :
-            this(hexAid.chunked(2).map { it.toUByte(16).toByte() }.toByteArray())
+        this(hexAid.chunked(2).map { it.toUByte(16).toByte() }.toByteArray())
 
     /**
      * Represents the value of an Application Identifier (AID).
