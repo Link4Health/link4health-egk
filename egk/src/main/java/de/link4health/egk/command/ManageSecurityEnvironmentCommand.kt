@@ -75,11 +75,11 @@ fun HealthCardCommand.Companion.manageSecEnvWithoutCurves(
         data =
         // '80 I2OS(OctetLength(OID), 1) || OID || 83 01 || keyRef'
         DERTaggedObject(false, 0, DEROctetString(oid)).encoded +
-                DERTaggedObject(
-                    false,
-                    3,
-                    DEROctetString(byteArrayOf(cardKey.calculateKeyReference(dfSpecific).toByte()))
-                ).encoded
+            DERTaggedObject(
+                false,
+                3,
+                DEROctetString(byteArrayOf(cardKey.calculateKeyReference(dfSpecific).toByte()))
+            ).encoded
     )
 
 /**
@@ -103,9 +103,9 @@ fun HealthCardCommand.Companion.manageSecEnvForSigning(
             4,
             DEROctetString(byteArrayOf(key.calculateKeyReference(dfSpecific).toByte()))
         ).encoded +
-                DERTaggedObject(
-                    false,
-                    0,
-                    DEROctetString(byteArrayOf(psoAlgorithm.identifier.toByte()))
-                ).encoded
+            DERTaggedObject(
+                false,
+                0,
+                DEROctetString(byteArrayOf(psoAlgorithm.identifier.toByte()))
+            ).encoded
     )
