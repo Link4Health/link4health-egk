@@ -20,7 +20,7 @@ nameSpaceEgkiAndroid = "de.link4health.egk"
 libraryPackageNameEgkAndroid = "de.link4health.egk.api"
 majorEgkAndroid = "1"
 minorEgkAndroid = "0"
-patchEgkAndroid = "0"
+patchEgkAndroid = "1"
 ## Egk API Android section end
 
 kotlin = "2.0.0"
