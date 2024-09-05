@@ -74,7 +74,7 @@ class HealthCardCommand(
         val apduLength = commandAPDU.bytes.size
         require(apduLength <= channel.maxTransceiveLength) {
             "CommandApdu is too long to send. Limit for Reader is " + channel.maxTransceiveLength +
-                    " but length of commandApdu is " + apduLength
+                " but length of commandApdu is " + apduLength
         }
         return commandAPDU
     }
