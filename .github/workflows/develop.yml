@@ -57,6 +57,7 @@ jobs:
 
       - name: Create gradle.properties
         run: |
+          mkdir -p ~/.gradle
           echo "githubUser=${{ secrets.PUBLISH_USER }}" >> ~/.gradle/gradle.properties
           echo "githubToken=${{ secrets.RELEASE_GITHUB_TOKEN }}" >> ~/.gradle/gradle.properties
           echo "releaseType=SNAPSHOT" >> ~/.gradle/gradle.properties
