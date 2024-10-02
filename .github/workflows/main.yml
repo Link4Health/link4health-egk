@@ -8,6 +8,12 @@ on:
         description: 'Tag to create or update'
         required: true
 
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -104,7 +110,6 @@ jobs:
       - name: Create or Update Git Tag
         id: create_tag
         run: |
-          cd api-shared || exit 1
           TAG_NAME="${{ env.TAG_NAME }}"
           git tag -fa "$TAG_NAME" -m "Release $TAG_NAME"
 
