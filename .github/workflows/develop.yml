@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout Egk library
-      - uses: actions/checkout@v4
+        uses: actions/checkout@v4
 
       - name: Extract version information
         run: |
