@@ -1,16 +1,23 @@
 name: Create Release for eGK library
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to create or update'
+        required: true
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
+      - name: Checkout Egk library
+        uses: actions/checkout@v4
+        with:
+          ref: 'main'
+          fetch-depth: 0
+
       - name: Extract version information
         run: |
           majorEgkAndroid=$(awk -F "=" '/majorEgkAndroid/ {print $2}' gradle/libs.versions.toml | xargs)
@@ -25,51 +32,108 @@ jobs:
           echo "SHORT_SHA=$(echo ${{ github.sha }} | cut -c 1-7)" >> $GITHUB_ENV
           echo "TAG_NAME=v${majorEgkAndroid}.${minorEgkAndroid}.${patchEgkAndroid}" >> $GITHUB_ENV
 
-      - name: set up JDK 17
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: gradle
 
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.gradle/gradle.properties
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Set up git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Set up Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v3
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew clean assembleRelease
-
-      - name: Debug Build Output
-        run: ls -la egk/build/outputs/aar/
-      - name: Set git user
+      - name: Create gradle.properties
         run: |
-          git config user.name "NDuering"
-          git config user.email "normen.duering@ehealthexperts.de"
+          mkdir -p ~/.gradle
+          echo "githubUser=${{ secrets.PUBLISH_USER }}" >> ~/.gradle/gradle.properties
+          echo "githubToken=${{ secrets.RELEASE_GITHUB_TOKEN }}" >> ~/.gradle/gradle.properties
+          echo "releaseType=" >> ~/.gradle/gradle.properties
+          echo "org.gradle.internal.publish.checksums.insecure=true" >> ~/.gradle/gradle.properties
 
-      - name: Create new release tag
+      - name: Build and Publish Egk Release
+        run: |
+          ./gradlew :egk:publishLink4HealthEgkLibraryPublicationToGitHubPackagesRepository
+
+
+      - name: Set Tag Name
+        id: set_tag_name
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "TAG_NAME=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+          else
+            TAG_NAME="v${{ env.MAJOR_EGK_API_VERSION }}.${{ env.MINOR_EGK_API_VERSION }}.${{ env.PATCH_EGK_API_VERSION }}"
+            echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
+          fi
+
+      - name: Check if Release exists
+        id: check_release
+        run: |
+          RELEASE_URL="https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.TAG_NAME }}"
+          response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" $RELEASE_URL)
+          echo "$response" > response.json
+          echo "RELEASE_RESPONSE=$(<response.json jq -c)" >> $GITHUB_ENV
+
+      - name: Delete existing release
+        if: env.RELEASE_RESPONSE != 'null'
+        run: |
+          RELEASE_ID=$(echo '${{ env.RELEASE_RESPONSE }}' | jq -r '.id')
+          if [[ "$RELEASE_ID" != "null" && "$RELEASE_ID" != "" ]]; then
+            echo "Deleting release $RELEASE_ID"
+            curl -X DELETE -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID"
+          fi
+
+      - name: Create or Update Git Tag
+        id: create_tag
+        run: |
+          cd api-shared || exit 1
+          TAG_NAME="${{ env.TAG_NAME }}"
+          git tag -fa "$TAG_NAME" -m "Release $TAG_NAME"
+
+      - name: Push Tag to Repository
+        id: push_tag
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
         run: |
-          git tag -a ${{ env.TAG_NAME }} -m "Release ${{ env.TAG_NAME }}"
-          git push origin ${{ env.TAG_NAME }}
+          TAG_NAME="${{ env.TAG_NAME }}"
+          git push origin "$TAG_NAME" --force
+
+      - name: Read release notes
+        id: get_release_notes
+        run: |
+          if [[ ! -f RELEASENOTES.md ]]; then
+            echo "::error::RELEASENOTES.md file not found"
+            exit 1
+          fi
+          release_notes=$(cat RELEASENOTES.md)
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          echo "$release_notes" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.TAG_NAME }}
-          release_name: Release ${{ env.TAG_NAME }}
-          draft: false
-          prerelease: false
-
-      - name: Upload Release Asset
-        id: upload_release_asset
-        uses: actions/upload-release-asset@v1
+          files: |
+            egk/build/outputs/aar/link4health-egk-library-${{ env.MAJOR_EGK_API_VERSION }}.${{ env.MINOR_EGK_API_VERSION }}.${{ env.PATCH_EGK_API_VERSION }}-${{ env.SHORT_SHA }}.aar
+          body: ${{ env.RELEASE_NOTES }}
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: egk/build/outputs/aar/link4health-egk-library-${{ env.MAJOR_EGK_API_VERSION }}.${{ env.MINOR_EGK_API_VERSION }}.${{ env.PATCH_EGK_API_VERSION }}-${{ env.SHORT_SHA }}.aar
-          asset_name: link4health-egk-library-${{ env.MAJOR_EGK_API_VERSION }}.${{ env.MINOR_EGK_API_VERSION }}.${{ env.PATCH_EGK_API_VERSION }}-#${{ github.run_number }}-${{ env.SHORT_SHA }}
-          asset_content_type: application/zip
