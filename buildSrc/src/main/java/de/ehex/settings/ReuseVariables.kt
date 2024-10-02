@@ -1,31 +1,15 @@
 package de.ehex.settings
 
 import org.gradle.api.Project
-import java.nio.file.Paths
+import java.net.HttpURLConnection
+import java.net.URI
+import java.net.URISyntaxException
+import java.net.URL
 import java.util.*
 
-val userHome: String = System.getProperty("user.home")
 val injectVariable: Map<String, String> = System.getenv()
 val GITHUB_BUILD_NUMBER: String = System.getenv("GITHUB_RUN_NUMBER") ?: "0"
 
-/**
- * Loads the user-specific Gradle properties from the ".gradle
- **/
-fun loadUserGradleProperties(): Properties {
-    val propertiesFile = Paths.get(userHome, ".gradle", "gradle.properties").toFile()
-
-    return Properties().apply {
-        if (propertiesFile.exists()) {
-            propertiesFile.reader().use { reader -> load(reader) }
-        }
-    }
-}
-
-/**
- * Retrieves the abbreviated hash of the current Git commit.
- *
- * @return The abbreviated Git hash of the current commit.
- */
 fun Project.getGitHash(): String {
     val dir = project.projectDir
     val process = ProcessBuilder("git", "rev-parse", "--short", "HEAD")
@@ -35,4 +19,33 @@ fun Project.getGitHash(): String {
         .start()
 
     return process.inputStream.bufferedReader().readText().trim()
+}
+
+// To avoid changing the original order, the following function and task are placed here:
+fun doesArtifactExist(repositoryUrl: String, artifactPath: String, username: String?, token: String?): Boolean {
+    if (username == null || token == null) {
+        println("Username and token must not be null.")
+        return false
+    }
+
+    val urlString = "$repositoryUrl/$artifactPath".replace(" ", "%20")
+    val url: URL? = try {
+        URI(urlString).toURL()
+    } catch (e: URISyntaxException) {
+        println("URISyntaxException: ${e.message}")
+        null
+    }
+
+    return if (url != null) {
+        with(url.openConnection() as HttpURLConnection) {
+            requestMethod = "HEAD"
+            setRequestProperty(
+                "Authorization",
+                "Basic " + Base64.getEncoder().encodeToString("$username:$token".toByteArray())
+            )
+            responseCode == HttpURLConnection.HTTP_OK
+        }
+    } else {
+        false
+    }
 }

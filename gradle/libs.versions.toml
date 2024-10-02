@@ -9,6 +9,7 @@ detekt = "1.23.4"
 jacoco = "0.8.11"
 dokka = "1.9.20"
 agp = "8.2.2"
+gradle-wrapper = "8.10.1"
 
 compileSdk = "34"
 minSDK = "30"

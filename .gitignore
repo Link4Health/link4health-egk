@@ -61,6 +61,3 @@ replay_pid*
 
 !/gradle/wrapper/gradle-wrapper.jar
 /.composite-enable
-/docs/javaDoc/
-/docs/licenses/
-/docs/owasp-dependency-check/
