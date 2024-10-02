@@ -210,13 +210,12 @@ publishing {
         create<MavenPublication>("Link4HealthEgkLibrary") {
             groupId = libraryPackageName
             artifactId = rootProject.name
-            version = "1.0.1"
-//            version = if (releaseType.isEmpty()) {
-//                "$libraryVersion-$gitHash"
-//            } else {
-//                "$libraryVersion-$gitHash-$releaseType"
-//            }
-            artifact("${layout.buildDirectory.get()}/outputs/aar/link4health-egk-library-1.0.1-7a5c11e.aar") {
+            version = if (releaseType.isEmpty()) {
+                "$libraryVersion-$gitHash"
+            } else {
+                "$libraryVersion-$gitHash-$releaseType"
+            }
+            artifact("${layout.buildDirectory.get()}/outputs/aar/$artifactId-$version-${getGitHash()}.aar") {
                 extension = "aar"
             }
             pom {
