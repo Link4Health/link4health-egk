@@ -8,3 +8,10 @@ plugins {
     alias(libs.plugins.dependency.check.gradle) apply false
     alias(libs.plugins.gradle.license.report) apply false
 }
+
+tasks.register("updateGradleWrapper", Wrapper::class) {
+    group = "gradle"
+    description = "Updates the Gradle Wrapper to a specified version"
+    gradleVersion = libs.versions.gradle.wrapper.get()
+    distributionType = Wrapper.DistributionType.ALL
+}

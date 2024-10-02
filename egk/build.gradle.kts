@@ -1,6 +1,7 @@
 import de.ehex.settings.GITHUB_BUILD_NUMBER
+import de.ehex.settings.doesArtifactExist
 import de.ehex.settings.getGitHash
-import java.util.*
+import java.net.URISyntaxException
 
 plugins {
     alias(libs.plugins.androidLibrary)
@@ -13,6 +14,9 @@ plugins {
     jacoco
     `maven-publish`
 }
+
+apply(from = "../generateDoku.gradle.kts")
+
 detekt {
     val configDir = "${project.layout.projectDirectory.asFile.absolutePath}/config/detekt"
     toolVersion = libs.versions.detekt.get()
@@ -33,6 +37,7 @@ detekt {
     // Optional: If set to true, ignores all rules in the baseline XML.
     baseline = file("${configDir}/detekt-baseline.xml")
 }
+
 jacoco {
     toolVersion = libs.versions.jacoco.get()
 }
@@ -81,13 +86,8 @@ val nvdApiKey: String? by extra
 dependencyCheck {
     autoUpdate = true
     analyzedTypes = listOf("jar, aar")
-    outputDirectory = "${rootProject.projectDir}/docs/owasp-dependency-check"
     format = "HTML"
     nvd.apiKey = nvdApiKey
-}
-
-tasks.dokkaHtml {
-    outputDirectory.set(File("${rootProject.projectDir}/docs/javaDoc/"))
 }
 
 tasks.register<Jar>("dokkaHtmlJar") {
@@ -112,7 +112,7 @@ licenseReport {
 
     // Set output directory for the report data.
     // Defaults to ${project.buildDir}/reports/dependency-license.
-    outputDir = "${rootProject.projectDir}/docs/licenses"
+//    outputDir = "${rootProject.projectDir}/docs/licenses"
 
     // Select projects to examine for dependencies.
     // Defaults to current project and all its subprojects
@@ -139,8 +139,13 @@ licenseReport {
 val injectVariable: MutableMap<String, String> = System.getenv()
 val buildNumber: String = GITHUB_BUILD_NUMBER
 val libraryPackageName: String = libs.versions.libraryPackageNameEgkAndroid.get()
-val libraryVersion =
-    "${libs.versions.majorEgkAndroid.get()}.${libs.versions.minorEgkAndroid.get()}.${libs.versions.patchEgkAndroid.get()}"
+val majorVersion = libs.versions.majorEgkAndroid.get()
+val minorVersion = libs.versions.minorEgkAndroid.get()
+val patchVersion = libs.versions.patchEgkAndroid.get()
+val releaseType: String by project.extra
+
+val libraryVersion = "$majorVersion.$minorVersion.$patchVersion"
+val gitHash = getGitHash()
 
 android {
     namespace = libs.versions.nameSpaceEgkiAndroid.get()
@@ -161,10 +166,10 @@ android {
     }
 
     tasks.withType<com.android.build.gradle.tasks.BundleAar>().configureEach {
-        val type = if (name.lowercase(Locale.getDefault()).contains("release")) {
-            "$libraryVersion-${getGitHash()}"
+        val type = if (releaseType.isEmpty()) {
+            "$libraryVersion-$gitHash"
         } else {
-            "$libraryVersion-#$buildNumber-${getGitHash()}"
+            "$libraryVersion-$gitHash-$releaseType"
         }
         archiveFileName.set("${rootProject.name}-$type.aar")
     }
@@ -205,8 +210,13 @@ publishing {
         create<MavenPublication>("Link4HealthEgkLibrary") {
             groupId = libraryPackageName
             artifactId = rootProject.name
-            version = libraryVersion
-            artifact("${layout.buildDirectory.get()}/outputs/aar/$artifactId-$version-${getGitHash()}.aar") {
+            version = "1.0.1"
+//            version = if (releaseType.isEmpty()) {
+//                "$libraryVersion-$gitHash"
+//            } else {
+//                "$libraryVersion-$gitHash-$releaseType"
+//            }
+            artifact("${layout.buildDirectory.get()}/outputs/aar/link4health-egk-library-1.0.1-7a5c11e.aar") {
                 extension = "aar"
             }
             pom {
@@ -236,6 +246,19 @@ publishing {
             }
         }
     }
+    val gitHubContextUrl: String? by extra
+    val githubUser: String? by extra
+    val githubToken: String? by extra
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("$gitHubContextUrl/Link4Health/link4health-egk-library")
+            credentials {
+                username = githubUser
+                password = githubToken
+            }
+        }
+    }
 }
 
 afterEvaluate {
@@ -244,8 +267,48 @@ afterEvaluate {
         mustRunAfter("clean")
         dependsOn("bundleReleaseAar")
     }
-
+    tasks.named("publishLink4HealthEgkLibraryPublicationToGitHubPackagesRepository") {
+        dependsOn("clean")
+        mustRunAfter("clean")
+        dependsOn("bundleReleaseAar")
+        dependsOn("checkEgkExistence") // Ensures `checkEgkExistence` runs before this task
+        onlyIf {
+            val artifactEgkExists = project.extra["artifactEgkExists"] as? Boolean ?: false
+            !artifactEgkExists
+        }
+        doFirst {
+            println("Publishing Link4HealthSharedApi as the artifact does not exist.")
+        }
+    }
     tasks.named("bundleReleaseAar") {
         mustRunAfter("clean")
+    }
+}
+
+tasks.register("checkEgkExistence") {
+    group = "verification"
+    doLast {
+        val repositoryUrl = "https://maven.pkg.github.com/Link4Health/link4health-egk-library"
+        val groupId = "de/link4health/egk/api"
+        val artifactId = "link4health-egk-library"
+        val version = libraryVersion
+
+        val artifactPath = "$groupId/$artifactId/$version/$artifactId-$version.aar"
+
+        val username = project.findProperty("githubUser") as String
+        val token = project.findProperty("githubToken") as String
+
+        try {
+            println("Checking the existence of the artifact at: $repositoryUrl/$artifactPath")
+            val artifactApiSharedExists = doesArtifactExist(repositoryUrl, artifactPath, username, token)
+            project.extra["artifactApiSharedExists"] = artifactApiSharedExists
+            if (artifactApiSharedExists) {
+                println("The artifact already exists.")
+            } else {
+                println("The artifact does not exist.")
+            }
+        } catch (e: URISyntaxException) {
+            println("URISyntaxException: ${e.message}")
+        }
     }
 }

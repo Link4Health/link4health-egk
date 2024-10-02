@@ -15,8 +15,6 @@ dependencyResolutionManagement {
         mavenLocal()
         mavenCentral()
         google()
-        gradlePluginPortal()
-
     }
 }
 rootProject.name = "link4health-egk-library"
