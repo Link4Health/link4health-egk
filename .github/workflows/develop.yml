@@ -68,7 +68,6 @@ jobs:
 
       - name: Build and Publish Egk SNAPSHOT
         run: |
-          cd api-shared
           ./gradlew :egk:publishLink4HealthEgkLibraryPublicationToGitHubPackagesRepository
 
       - name: Upload aar archive
