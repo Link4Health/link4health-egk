@@ -138,7 +138,7 @@ licenseReport {
 
 val injectVariable: MutableMap<String, String> = System.getenv()
 val buildNumber: String = GITHUB_BUILD_NUMBER
-val libraryPackageName: String = libs.versions.libraryPackageNameEgkAndroid.get()
+val libraryPackageNameEgkAndroid: String = libs.versions.libraryPackageNameEgkAndroid.get()
 val majorVersion = libs.versions.majorEgkAndroid.get()
 val minorVersion = libs.versions.minorEgkAndroid.get()
 val patchVersion = libs.versions.patchEgkAndroid.get()
@@ -208,7 +208,7 @@ dependencies {
 publishing {
     publications {
         create<MavenPublication>("Link4HealthEgkLibrary") {
-            groupId = libraryPackageName
+            groupId = libraryPackageNameEgkAndroid
             artifactId = rootProject.name
             version = if (releaseType.isEmpty()) {
                 "$libraryVersion-$gitHash"
@@ -290,7 +290,11 @@ tasks.register("checkEgkExistence") {
         val repositoryUrl = "https://maven.pkg.github.com/Link4Health/link4health-egk-library"
         val groupId = "de/link4health/egk/api"
         val artifactId = "link4health-egk-library"
-        val version = libraryVersion
+        val version = if (releaseType.isEmpty()) {
+            "$libraryVersion-$gitHash"
+        } else {
+            "$libraryVersion-$gitHash-$releaseType"
+        }
 
         val artifactPath = "$groupId/$artifactId/$version/$artifactId-$version.aar"
 
