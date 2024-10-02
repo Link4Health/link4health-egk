@@ -215,7 +215,7 @@ publishing {
             } else {
                 "$libraryVersion-$gitHash-$releaseType"
             }
-            artifact("${layout.buildDirectory.get()}/outputs/aar/$artifactId-$version-${getGitHash()}.aar") {
+            artifact("${layout.buildDirectory.get()}/outputs/aar/$artifactId-$version.aar") {
                 extension = "aar"
             }
             pom {
