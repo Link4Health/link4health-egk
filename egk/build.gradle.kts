@@ -300,9 +300,9 @@ tasks.register("checkEgkExistence") {
 
         try {
             println("Checking the existence of the artifact at: $repositoryUrl/$artifactPath")
-            val artifactApiSharedExists = doesArtifactExist(repositoryUrl, artifactPath, username, token)
-            project.extra["artifactApiSharedExists"] = artifactApiSharedExists
-            if (artifactApiSharedExists) {
+            val artifactEgkExists = doesArtifactExist(repositoryUrl, artifactPath, username, token)
+            project.extra["artifactEgkExists"] = artifactEgkExists
+            if (artifactEgkExists) {
                 println("The artifact already exists.")
             } else {
                 println("The artifact does not exist.")
