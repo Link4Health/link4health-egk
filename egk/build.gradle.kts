@@ -167,7 +167,7 @@ android {
 
     tasks.withType<com.android.build.gradle.tasks.BundleAar>().configureEach {
         val type = if (releaseType.isEmpty()) {
-            "$libraryVersion-$gitHash"
+            libraryVersion
         } else {
             "$libraryVersion-$gitHash-$releaseType"
         }
@@ -211,7 +211,7 @@ publishing {
             groupId = libraryPackageNameEgkAndroid
             artifactId = rootProject.name
             version = if (releaseType.isEmpty()) {
-                "$libraryVersion-$gitHash"
+                libraryVersion
             } else {
                 "$libraryVersion-$gitHash-$releaseType"
             }
