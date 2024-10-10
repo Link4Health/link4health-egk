@@ -16,6 +16,7 @@ permissions:
   contents: write
   pages: write
   id-token: write
+  pull-requests: write  # Permissions to create and manage pull requests
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 concurrency:
@@ -30,21 +31,23 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
 
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout EGK
         uses: actions/checkout@v4
         with:
+          repository: Link4Health/link4health-egk-library
           ref: 'main'  # Ensure the main branch is checked out
           fetch-depth: 0  # Fetch all history for all tags and branches
-          fetch-tags: true  # Ensure tags are fetched
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 17
+      - name: EGK grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Set up git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Set up Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v3
@@ -55,16 +58,27 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
+            ~/.gradle/gradle.properties
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Set up git identity
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: gradle
 
-      - name: Store secret in gradle.properties
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: ''
+
+      - name: Install Android SDK
+        run: sdkmanager "platform-tools" "platforms;android-34"
+
+      - name: Create gradle.properties
         run: |
           mkdir -p ~/.gradle
           echo "nvdApiKey=${{ secrets.NVD_API_KEY }}" >> ~/.gradle/gradle.properties
@@ -79,14 +93,6 @@ jobs:
       - name: Generate Documentation Index HTML
         run: ./gradlew generateDocIndexHtml
 
-      - name: Commit and Push Changes
-        run: |
-          git add docs
-          git commit -m "Update generated documentation"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.SDK_REPO_PAT }}
-
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
@@ -99,3 +105,23 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Create Pull Request
+        id: create_pr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sign-commits: true
+          commit-message: "Update generated documentation"
+          branch: pages-deployment
+          base: main
+          title: "Deploy Documentation and Reports"
+          body: "Automated deployment of documentation and reports"
+
+      # Optionally, automatically merge the PR if the checks pass
+      - name: Merge Pull Request
+        if: steps.create_pr.outputs.pull-request-url != ''
+        run: |
+          gh pr merge ${{ steps.create_pr.outputs.pull-request-url }} --merge --admin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,7 +1,10 @@
 name: Create Release for eGK library
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+    paths-ignore:
+      - 'docs/**'  # Ignore docs changes to prevent triggering this workflow
   workflow_dispatch:
     inputs:
       tag:
