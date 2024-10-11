@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.sonarqube) apply false
     alias(libs.plugins.dependency.check.gradle) apply false
     alias(libs.plugins.gradle.license.report) apply false
+    alias(libs.plugins.spotless) apply false
 }
 
 tasks.register("updateGradleWrapper", Wrapper::class) {

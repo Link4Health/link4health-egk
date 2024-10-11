@@ -20,7 +20,6 @@ package de.link4health.egk.exchange
 
 import org.bouncycastle.crypto.digests.SHA1Digest
 
-
 /**
  * This class provides functionality to derive AES-128 keys.
  */
@@ -66,6 +65,6 @@ object KeyDerivationFunction {
     enum class Mode {
         ENC, // key for encryption/decryption
         MAC, // key for MAC
-        PASSWORD // encryption keys from a password
+        PASSWORD, // encryption keys from a password
     }
 }

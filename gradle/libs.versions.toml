@@ -10,6 +10,7 @@ jacoco = "0.8.11"
 dokka = "1.9.20"
 agp = "8.2.2"
 gradle-wrapper = "8.10.1"
+spotless = "7.0.0.BETA2"
 
 compileSdk = "34"
 minSDK = "30"
@@ -59,3 +60,4 @@ sonarqube = { id = "org.sonarqube", version.ref = "sonarqubeGradlePlugin" }
 dedekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dependency-check-gradle = { id = "org.owasp.dependencycheck", version.ref = "dependencyCheckGradle" }
 gradle-license-report = { id = "com.github.jk1.dependency-license-report", version.ref = "gradleLicenseReport" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

@@ -1,19 +1,19 @@
 /*
  * Copyright (c) 2024 gematik GmbH
- * 
+ *
  * Licensed under the EUPL, Version 1.2 or – as soon they will be approved by
  * the European Commission - subsequent versions of the EUPL (the Licence);
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  *     https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
- * 
+ *
  */
 package de.link4health.egk
 
@@ -41,22 +41,21 @@ object CardUtilities {
      * @return EC point generated from input data
      */
     fun byteArrayToECPoint(byteArray: ByteArray, curve: ECCurve): ECPoint {
-        return if (byteArray[0] != UNCOMPRESSEDPOINTVALUE.toByte()) {
-            throw IllegalArgumentException("Found no uncompressed point!")
-        } else {
-            val x = ByteArray((byteArray.size - 1) / 2)
-            val y = ByteArray((byteArray.size - 1) / 2)
-
-            System.arraycopy(byteArray, 1, x, 0, (byteArray.size - 1) / 2)
-            System.arraycopy(
-                byteArray,
-                1 + (byteArray.size - 1) / 2,
-                y,
-                0,
-                (byteArray.size - 1) / 2
-            )
-            curve.createPoint(BigInteger(1, x), BigInteger(1, y))
+        require(byteArray[0] == UNCOMPRESSEDPOINTVALUE.toByte()) {
+            "Found no uncompressed point!"
         }
+        val x = ByteArray((byteArray.size - 1) / 2)
+        val y = ByteArray((byteArray.size - 1) / 2)
+
+        System.arraycopy(byteArray, 1, x, 0, (byteArray.size - 1) / 2)
+        System.arraycopy(
+            byteArray,
+            1 + (byteArray.size - 1) / 2,
+            y,
+            0,
+            (byteArray.size - 1) / 2,
+        )
+        return curve.createPoint(BigInteger(1, x), BigInteger(1, y))
     }
 
     /**

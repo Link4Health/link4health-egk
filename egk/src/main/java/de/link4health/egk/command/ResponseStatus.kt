@@ -1,19 +1,19 @@
 /*
  * Copyright (c) 2024 gematik GmbH
- * 
+ *
  * Licensed under the EUPL, Version 1.2 or – as soon they will be approved by
  * the European Commission - subsequent versions of the EUPL (the Licence);
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  *     https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
- * 
+ *
  */
 
 package de.link4health.egk.command
@@ -33,7 +33,7 @@ val generalAuthenticateStatus = mapOf(
     0x6985 to ResponseStatus.NO_KEY_REFERENCE,
     0x6A80 to ResponseStatus.NUMBER_PRECONDITION_WRONG,
     0x6A81 to ResponseStatus.UNSUPPORTED_FUNCTION,
-    0x6A88 to ResponseStatus.KEY_NOT_FOUND
+    0x6A88 to ResponseStatus.KEY_NOT_FOUND,
 )
 
 /**
@@ -50,7 +50,7 @@ val pinStatus = mapOf(
     0x63C2 to ResponseStatus.RETRY_COUNTER_COUNT_02,
     0x63C3 to ResponseStatus.RETRY_COUNTER_COUNT_03,
     0x6982 to ResponseStatus.SECURITY_STATUS_NOT_SATISFIED,
-    0x6988 to ResponseStatus.PASSWORD_NOT_FOUND
+    0x6988 to ResponseStatus.PASSWORD_NOT_FOUND,
 )
 
 /**
@@ -62,7 +62,7 @@ val pinStatus = mapOf(
 val manageSecurityEnvironmentStatus = mapOf(
     0x9000 to ResponseStatus.SUCCESS,
     0x6A81 to ResponseStatus.UNSUPPORTED_FUNCTION,
-    0x6A88 to ResponseStatus.KEY_NOT_FOUND
+    0x6A88 to ResponseStatus.KEY_NOT_FOUND,
 )
 
 /**
@@ -78,7 +78,7 @@ val psoComputeDigitalSignatureStatus = mapOf(
     0x6982 to ResponseStatus.SECURITY_STATUS_NOT_SATISFIED,
     0x6985 to ResponseStatus.NO_KEY_REFERENCE,
     0x6A81 to ResponseStatus.UNSUPPORTED_FUNCTION,
-    0x6A88 to ResponseStatus.KEY_NOT_FOUND
+    0x6A88 to ResponseStatus.KEY_NOT_FOUND,
 )
 
 /**
@@ -105,7 +105,7 @@ val internalResponseMessageStatus = mapOf(
     0x6985 to ResponseStatus.NO_KEY_REFERENCE,
     0x6A81 to ResponseStatus.UNSUPPORTED_FUNCTION,
     0x6A80 to ResponseStatus.WRONG_TOKEN,
-    0x6A88 to ResponseStatus.KEY_NOT_FOUND
+    0x6A88 to ResponseStatus.KEY_NOT_FOUND,
 )
 
 /**
@@ -119,7 +119,7 @@ val readStatus = mapOf(
     0x6982 to ResponseStatus.SECURITY_STATUS_NOT_SATISFIED,
     0x6986 to ResponseStatus.NO_CURRENT_EF,
     0x6A82 to ResponseStatus.FILE_NOT_FOUND,
-    0x6B00 to ResponseStatus.OFFSET_TOO_BIG
+    0x6B00 to ResponseStatus.OFFSET_TOO_BIG,
 )
 
 /**
@@ -132,7 +132,7 @@ val selectStatus = mapOf(
     0x6283 to ResponseStatus.FILE_DEACTIVATED,
     0x6285 to ResponseStatus.FILE_TERMINATED,
     0x6A82 to ResponseStatus.FILE_NOT_FOUND,
-    0x6D00 to ResponseStatus.INSTRUCTION_NOT_SUPPORTED
+    0x6D00 to ResponseStatus.INSTRUCTION_NOT_SUPPORTED,
 )
 
 /**
@@ -161,7 +161,7 @@ val verifySecretStatus = mapOf(
     0x6982 to ResponseStatus.SECURITY_STATUS_NOT_SATISFIED,
     0x6983 to ResponseStatus.PASSWORD_BLOCKED,
     0x6985 to ResponseStatus.PASSWORD_NOT_USABLE,
-    0x6988 to ResponseStatus.PASSWORD_NOT_FOUND
+    0x6988 to ResponseStatus.PASSWORD_NOT_FOUND,
 )
 
 /**
@@ -186,7 +186,7 @@ val unlockEgkStatus = mapOf(
     0x6581 to ResponseStatus.MEMORY_FAILURE,
     0x6982 to ResponseStatus.SECURITY_STATUS_NOT_SATISFIED,
     0x6985 to ResponseStatus.WRONG_PASSWORD_LENGTH,
-    0x6A88 to ResponseStatus.PASSWORD_NOT_FOUND
+    0x6A88 to ResponseStatus.PASSWORD_NOT_FOUND,
 )
 
 /**
@@ -224,7 +224,7 @@ val changeReferenceDataStatus = mapOf(
     0x6982 to ResponseStatus.SECURITY_STATUS_NOT_SATISFIED,
     0x6983 to ResponseStatus.PASSWORD_BLOCKED,
     0x6985 to ResponseStatus.WRONG_PASSWORD_LENGTH,
-    0x6A88 to ResponseStatus.PASSWORD_NOT_FOUND
+    0x6A88 to ResponseStatus.PASSWORD_NOT_FOUND,
 )
 
 /**
@@ -239,7 +239,7 @@ val changeReferenceDataStatus = mapOf(
  */
 val getRandomValuesStatus = mapOf(
     0x9000 to ResponseStatus.SUCCESS,
-    0x6982 to ResponseStatus.SECURITY_STATUS_NOT_SATISFIED
+    0x6982 to ResponseStatus.SECURITY_STATUS_NOT_SATISFIED,
 )
 
 /**
@@ -362,5 +362,5 @@ enum class ResponseStatus {
     DF_NAME_EXISTS,
     OFFSET_TOO_BIG,
     INSTRUCTION_NOT_SUPPORTED,
-    PUK_BLOCKED
+    PUK_BLOCKED,
 }

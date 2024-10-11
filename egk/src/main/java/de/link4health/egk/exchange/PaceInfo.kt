@@ -19,7 +19,11 @@
 package de.link4health.egk.exchange
 
 import de.link4health.egk.CardUtilities
-import org.bouncycastle.asn1.*
+import org.bouncycastle.asn1.ASN1InputStream
+import org.bouncycastle.asn1.ASN1Integer
+import org.bouncycastle.asn1.ASN1ObjectIdentifier
+import org.bouncycastle.asn1.ASN1Sequence
+import org.bouncycastle.asn1.DLSet
 import org.bouncycastle.jce.ECNamedCurveTable
 
 private const val PARAMETER256 = 13
@@ -59,7 +63,7 @@ class PaceInfo(cardAccess: ByteArray) {
             PARAMETER384 -> "BrainpoolP384r1"
             PARAMETER512 -> "BrainpoolP512r1"
             else -> ""
-        }
+        },
     )
 
     /**

@@ -40,7 +40,7 @@ private const val MODE_AFFECTED_LIST_ELEMENT_IS_SIGNATURE_CREATION = 0xB6
 fun HealthCardCommand.Companion.selectInternal(
     cardKey: CardKey,
     dfSpecific: Boolean,
-    oid: ByteArray?
+    oid: ByteArray?,
 ) =
     HealthCardCommand(
         expectedStatus = manageSecurityEnvironmentStatus,
@@ -53,8 +53,8 @@ fun HealthCardCommand.Companion.selectInternal(
         DERTaggedObject(
             false,
             4,
-            DEROctetString(byteArrayOf(cardKey.calculateKeyReference(dfSpecific).toByte()))
-        ).encoded + DERTaggedObject(false, 0, DEROctetString(oid)).encoded
+            DEROctetString(byteArrayOf(cardKey.calculateKeyReference(dfSpecific).toByte())),
+        ).encoded + DERTaggedObject(false, 0, DEROctetString(oid)).encoded,
 
     )
 
@@ -64,7 +64,7 @@ fun HealthCardCommand.Companion.selectInternal(
 fun HealthCardCommand.Companion.manageSecEnvWithoutCurves(
     cardKey: CardKey,
     dfSpecific: Boolean,
-    oid: ByteArray?
+    oid: ByteArray?,
 ) =
     HealthCardCommand(
         expectedStatus = manageSecurityEnvironmentStatus,
@@ -78,8 +78,8 @@ fun HealthCardCommand.Companion.manageSecEnvWithoutCurves(
             DERTaggedObject(
                 false,
                 3,
-                DEROctetString(byteArrayOf(cardKey.calculateKeyReference(dfSpecific).toByte()))
-            ).encoded
+                DEROctetString(byteArrayOf(cardKey.calculateKeyReference(dfSpecific).toByte())),
+            ).encoded,
     )
 
 /**
@@ -88,7 +88,7 @@ fun HealthCardCommand.Companion.manageSecEnvWithoutCurves(
 fun HealthCardCommand.Companion.manageSecEnvForSigning(
     psoAlgorithm: PsoAlgorithm,
     key: CardKey,
-    dfSpecific: Boolean
+    dfSpecific: Boolean,
 ) =
     HealthCardCommand(
         expectedStatus = manageSecurityEnvironmentStatus,
@@ -101,11 +101,11 @@ fun HealthCardCommand.Companion.manageSecEnvForSigning(
         DERTaggedObject(
             false,
             4,
-            DEROctetString(byteArrayOf(key.calculateKeyReference(dfSpecific).toByte()))
+            DEROctetString(byteArrayOf(key.calculateKeyReference(dfSpecific).toByte())),
         ).encoded +
             DERTaggedObject(
                 false,
                 0,
-                DEROctetString(byteArrayOf(psoAlgorithm.identifier.toByte()))
-            ).encoded
+                DEROctetString(byteArrayOf(psoAlgorithm.identifier.toByte())),
+            ).encoded,
     )

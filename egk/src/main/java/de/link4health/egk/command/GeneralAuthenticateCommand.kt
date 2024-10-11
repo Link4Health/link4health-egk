@@ -45,7 +45,7 @@ fun HealthCardCommand.Companion.generalAuthenticate(commandChaining: Boolean) =
         p1 = NO_MEANING,
         p2 = NO_MEANING,
         data = DERTaggedObject(false, BERTags.APPLICATION, 28, DERSequence()).encoded,
-        ne = NE_MAX_SHORT_LENGTH
+        ne = NE_MAX_SHORT_LENGTH,
     )
 
 /**
@@ -57,7 +57,7 @@ fun HealthCardCommand.Companion.generalAuthenticate(commandChaining: Boolean) =
 fun HealthCardCommand.Companion.generalAuthenticate(
     commandChaining: Boolean,
     data: ByteArray,
-    tagNo: Int
+    tagNo: Int,
 ) =
     HealthCardCommand(
         expectedStatus = generalAuthenticateStatus,
@@ -69,7 +69,7 @@ fun HealthCardCommand.Companion.generalAuthenticate(
             true,
             BERTags.APPLICATION,
             28,
-            DERTaggedObject(false, tagNo, DEROctetString(data))
+            DERTaggedObject(false, tagNo, DEROctetString(data)),
         ).encoded,
-        ne = NE_MAX_SHORT_LENGTH
+        ne = NE_MAX_SHORT_LENGTH,
     )

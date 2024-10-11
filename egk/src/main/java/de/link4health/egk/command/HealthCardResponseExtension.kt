@@ -1,6 +1,5 @@
 package de.link4health.egk.command
 
-
 /**
  * Checks if the response status of the `HealthCardResponse` object is `SUCCESS`. If it is not,
  * throws a `ResponseException`.

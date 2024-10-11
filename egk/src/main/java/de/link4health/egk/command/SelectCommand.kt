@@ -1,19 +1,19 @@
 /*
  * Copyright (c) 2024 gematik GmbH
- * 
+ *
  * Licensed under the EUPL, Version 1.2 or – as soon they will be approved by
  * the European Commission - subsequent versions of the EUPL (the Licence);
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  *     https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
- * 
+ *
  */
 
 package de.link4health.egk.command
@@ -65,7 +65,7 @@ fun HealthCardCommand.Companion.select(selectParentElseRoot: Boolean, readFirst:
         ins = INS,
         p1 = if (selectParentElseRoot) SELECTION_MODE_PARENT else SELECTION_MODE_AID,
         p2 = calculateP2(readFirst, false),
-        ne = if (readFirst) EXPECT_ALL_WILDCARD else null
+        ne = if (readFirst) EXPECT_ALL_WILDCARD else null,
     )
 
 // Note: Left out use cases Select without Application Identifier, next gemSpec_Cos#14.2.6.3 - 14.2.6.4
@@ -79,7 +79,7 @@ fun HealthCardCommand.Companion.select(aid: ApplicationIdentifier) =
         aid,
         selectNextElseFirstOccurrence = false,
         requestFcp = false,
-        fcpLength = 0
+        fcpLength = 0,
     )
 
 /**
@@ -91,7 +91,7 @@ fun HealthCardCommand.Companion.select(
     aid: ApplicationIdentifier,
     selectNextElseFirstOccurrence: Boolean,
     requestFcp: Boolean,
-    fcpLength: Int
+    fcpLength: Int,
 ) =
     HealthCardCommand(
         expectedStatus = selectStatus,
@@ -100,7 +100,7 @@ fun HealthCardCommand.Companion.select(
         p1 = SELECTION_MODE_AID,
         p2 = calculateP2(requestFcp, selectNextElseFirstOccurrence),
         data = aid.aid,
-        ne = if (requestFcp) fcpLength else null
+        ne = if (requestFcp) fcpLength else null,
     )
 
 /**
@@ -121,7 +121,7 @@ fun HealthCardCommand.Companion.select(
     fid: FileIdentifier,
     selectDfElseEf: Boolean,
     requestFcp: Boolean,
-    fcpLength: Int
+    fcpLength: Int,
 ) =
     HealthCardCommand(
         expectedStatus = selectStatus,
@@ -130,5 +130,5 @@ fun HealthCardCommand.Companion.select(
         p1 = if (selectDfElseEf) SELECTION_MODE_DF_BY_FID else SELECTION_MODE_EF_BY_FID,
         p2 = if (requestFcp) P2_FCP else P2,
         data = fid.getFid(),
-        ne = if (requestFcp) fcpLength else null
+        ne = if (requestFcp) fcpLength else null,
     )

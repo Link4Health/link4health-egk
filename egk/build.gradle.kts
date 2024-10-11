@@ -11,31 +11,57 @@ plugins {
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.dependency.check.gradle)
     alias(libs.plugins.gradle.license.report)
+    alias(libs.plugins.spotless)
     jacoco
     `maven-publish`
 }
 
 apply(from = "../generateDoku.gradle.kts")
 
+spotless {
+    kotlin {
+        target("**/*.kt")
+        targetExclude("**/build/**", "src/androidUnitTest/**/*.kt", "src/test/**/*.kt")
+        ktlint("0.48.0").editorConfigOverride(
+            mapOf(
+                "indent_size" to "4",
+                "continuation_indent_size" to "4",
+                "max_line_length" to "180",
+                "insert_final_newline" to "true",
+                "charset" to "utf-8",
+                "end_of_line" to "lf",
+            ),
+        )
+    }
+    kotlinGradle {
+        target("*.gradle.kts")
+        ktlint("0.48.0").editorConfigOverride(
+            mapOf(
+                "indent_size" to "4",
+                "continuation_indent_size" to "4",
+                "max_line_length" to "180",
+            ),
+        )
+    }
+}
+
 detekt {
     val configDir = "${project.layout.projectDirectory.asFile.absolutePath}/config/detekt"
     toolVersion = libs.versions.detekt.get()
-    config.setFrom(files("${configDir}/detekt.yml"))
+    config.setFrom(files("$configDir/detekt.yml"))
     // Optional: Define which directories should be scanned. If unspecified, detekt will scan all kotlin sources.
     source.from(
         files(
             "src/main/kotlin",
             "src/main/java",
-            "src/test/kotlin",
-            "src/test/java"
-        )
+        ),
     )
     // Build upon the default configuration provided by Detekt
     buildUponDefaultConfig = true
     // Optional: By default, Detekt does not fail the build when issues are found. Set this to true to fail the build.
     ignoreFailures = false
     // Optional: If set to true, ignores all rules in the baseline XML.
-    baseline = file("${configDir}/detekt-baseline.xml")
+    baseline = file("$configDir/detekt-baseline.xml")
 }
 
 jacoco {
@@ -63,7 +89,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/R\$*.class",
         "**/BuildConfig.*",
         "**/Manifest*.*",
-        "android/**/*.*"
+        "android/**/*.*",
     )
     val mainSrc = "${project.projectDir}/src/main/java"
 
@@ -150,7 +176,12 @@ val gitHash = getGitHash()
 android {
     namespace = libs.versions.nameSpaceEgkiAndroid.get()
     compileSdk = libs.versions.compileSdk.get().toInt()
-
+    lint {
+        baseline = file("config/lint/lint-baseline.xml")
+        abortOnError = true
+        warningsAsErrors = true
+        checkDependencies = true
+    }
     defaultConfig {
         minSdk = libs.versions.minSDK.get().toInt()
 
@@ -186,7 +217,6 @@ android {
     kotlinOptions {
         jvmTarget = libs.versions.javaTarget.get()
     }
-
 }
 
 dependencies {

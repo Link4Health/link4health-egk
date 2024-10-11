@@ -35,12 +35,12 @@ package de.link4health.egk
     AnnotationTarget.TYPE,
     AnnotationTarget.TYPEALIAS,
     AnnotationTarget.TYPE_PARAMETER,
-    AnnotationTarget.VALUE_PARAMETER
+    AnnotationTarget.VALUE_PARAMETER,
 )
 @Retention(AnnotationRetention.SOURCE)
 @Repeatable
 annotation class Requirement(
     vararg val requirements: String,
     val sourceSpecification: String,
-    val rationale: String
+    val rationale: String,
 )

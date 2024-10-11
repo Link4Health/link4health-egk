@@ -61,7 +61,7 @@ class HealthCardVersion2(
     /**
      * Information of C7 with version of filling instruction for EF.GDO
      */
-    val fillingInstructionsEfLoggingVersion: ByteArray // C7
+    val fillingInstructionsEfLoggingVersion: ByteArray, // C7
 ) {
     companion object {
         private fun processData(data: ByteArray): Map<Int, ByteArray> =
@@ -96,7 +96,7 @@ class HealthCardVersion2(
                     fillingInstructionsEfGdoVersion = it[4] ?: byteArrayOf(),
                     fillingInstructionsEfAtrVersion = it[5] ?: byteArrayOf(),
                     fillingInstructionsEfKeyInfoVersion = it[6] ?: byteArrayOf(),
-                    fillingInstructionsEfLoggingVersion = it[7] ?: byteArrayOf()
+                    fillingInstructionsEfLoggingVersion = it[7] ?: byteArrayOf(),
                 )
             }
     }

@@ -1,19 +1,19 @@
 /*
  * Copyright (c) 2024 gematik GmbH
- * 
+ *
  * Licensed under the EUPL, Version 1.2 or – as soon they will be approved by
  * the European Commission - subsequent versions of the EUPL (the Licence);
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  *     https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
- * 
+ *
  */
 
 package de.link4health.egk.exchange
@@ -73,7 +73,7 @@ suspend fun ICardChannel.establishTrustedChannel(cardAccessNumber: String): Pace
      */
     suspend fun step0ReadSupportedPaceParameters(step1: suspend (paceInfo: PaceInfo) -> PaceKey): PaceKey {
         HealthCardCommand.select(selectParentElseRoot = false, readFirst = true).executeSuccessfulOn(
-            this
+            this,
         )
 
         HealthCardCommand.read(ShortFileIdentifier(Ef.Version2.SFID), 0).executeSuccessfulOn(this).let {
@@ -88,7 +88,7 @@ suspend fun ICardChannel.establishTrustedChannel(cardAccessNumber: String): Pace
         HealthCardCommand.manageSecEnvWithoutCurves(
             CardKey(SECRET_KEY_REFERENCE),
             false,
-            paceInfo.paceInfoProtocolBytes
+            paceInfo.paceInfoProtocolBytes,
         ).executeSuccessfulOn(this)
 
         return step1(paceInfo)
@@ -107,8 +107,8 @@ suspend fun ICardChannel.establishTrustedChannel(cardAccessNumber: String): Pace
             paceInfo: PaceInfo,
             nonceSInt: BigInteger,
             pcdSkX1: BigInteger,
-            pcdPk1: ByteArray
-        ) -> PaceKey
+            pcdPk1: ByteArray,
+        ) -> PaceKey,
     ): PaceKey {
         val nonceZBytes = HealthCardCommand.generalAuthenticate(true).executeSuccessfulOn(this).apdu.data
         val nonceZBytesEncoded = extractKeyObjectEncoded(nonceZBytes)
@@ -118,7 +118,7 @@ suspend fun ICardChannel.establishTrustedChannel(cardAccessNumber: String): Pace
             "O.Cryp_3#2",
             "O.Cryp_4#2",
             sourceSpecification = "BSI-eRp-ePA",
-            rationale = "AES Key-Generation and one time usage"
+            rationale = "AES Key-Generation and one time usage",
         )
         val aes128Key = getAES128Key(canBytes, KeyDerivationFunction.Mode.PASSWORD)
         val encKey = KeyParameter(aes128Key)
@@ -157,8 +157,8 @@ suspend fun ICardChannel.establishTrustedChannel(cardAccessNumber: String): Pace
         step3: suspend (
             paceInfo: PaceInfo,
             pcdSkX2: BigInteger,
-            pcdPkS2: ByteArray
-        ) -> PaceKey
+            pcdPkS2: ByteArray,
+        ) -> PaceKey,
     ): PaceKey {
         val piccPk1Bytes =
             HealthCardCommand.generalAuthenticate(true, pcdPk1, 1).executeSuccessfulOn(this).apdu.data
@@ -192,8 +192,8 @@ suspend fun ICardChannel.establishTrustedChannel(cardAccessNumber: String): Pace
         pcdPkS2: ByteArray,
         step4: suspend (
             piccMacDerived: ByteArray,
-            pcdMac: ByteArray
-        ) -> Boolean
+            pcdMac: ByteArray,
+        ) -> Boolean,
     ): PaceKey {
         val piccPk2Bytes =
             HealthCardCommand.generalAuthenticate(true, pcdPkS2, 3).executeSuccessfulOn(this).apdu.data
@@ -208,7 +208,7 @@ suspend fun ICardChannel.establishTrustedChannel(cardAccessNumber: String): Pace
 
         val paceKey = PaceKey(
             getAES128Key(sharedSecretKBytes, KeyDerivationFunction.Mode.ENC),
-            getAES128Key(sharedSecretKBytes, KeyDerivationFunction.Mode.MAC)
+            getAES128Key(sharedSecretKBytes, KeyDerivationFunction.Mode.MAC),
         )
 
         val pcdMac = deriveMac(paceKey.mac, piccPk2, paceInfo.protocolID)
@@ -229,7 +229,7 @@ suspend fun ICardChannel.establishTrustedChannel(cardAccessNumber: String): Pace
      */
     fun step4VerifyPcdAndPiccMac(
         piccMacDerived: ByteArray,
-        pcdMac: ByteArray
+        pcdMac: ByteArray,
     ): Boolean {
         val piccMacBytes =
             HealthCardCommand.generalAuthenticate(false, pcdMac, 5)
@@ -261,8 +261,8 @@ private fun createAsn1AuthToken(ecPoint: ByteArray, protocolID: String): ByteArr
         DERTaggedObject(
             false,
             TAG_6,
-            DEROctetString(ecPoint)
-        )
+            DEROctetString(ecPoint),
+        ),
     )
     return DERTaggedObject(false, BERTags.APPLICATION, TAG_49, DERSequence(asn1EncodableVector)).encoded
 }

@@ -10,5 +10,5 @@ package de.link4health.egk.command
  */
 class HealthCardResponse(
     val status: ResponseStatus,
-    val apdu: ResponseApdu
+    val apdu: ResponseApdu,
 )

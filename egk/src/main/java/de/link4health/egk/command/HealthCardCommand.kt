@@ -20,7 +20,6 @@ package de.link4health.egk.command
 
 import de.link4health.egk.card.ICardChannel
 
-
 /**
  * Superclass for all HealthCardCommands
  */
@@ -31,7 +30,7 @@ class HealthCardCommand(
     val p1: Int = 0,
     val p2: Int = 0,
     val data: ByteArray? = null,
-    val ne: Int? = null
+    val ne: Int? = null,
 ) {
 
     companion object {
