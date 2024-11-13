@@ -62,9 +62,9 @@ jobs:
           echo "Extracted minorSdk: $minorEgkAndroid"
           patchEgkAndroid=$(grep '^\s*patchEgkAndroid\s*=' gradle.properties | sed 's/.*=\s*//')
           echo "Extracted patchSdk: $patchEgkAndroid"
-          echo "MAJOR_EGK_API_VERSION=$majorEgkAndroid" >> $GITHUB_ENV
-          echo "MINOR_EGK_API_VERSION=$minorEgkAndroid" >> $GITHUB_ENV
-          echo "PATCH_EGK_API_VERSION=$patchEgkAndroid" >> $GITHUB_ENV
+          echo "MAJOR_EGK_VERSION=$majorEgkAndroid" >> $GITHUB_ENV
+          echo "MINOR_EGK_VERSION=$minorEgkAndroid" >> $GITHUB_ENV
+          echo "PATCH_EGK_VERSION=$patchEgkAndroid" >> $GITHUB_ENV
           echo "SHORT_SHA=$(echo ${{ github.sha }} | cut -c 1-7)" >> $GITHUB_ENV
           echo "TAG_NAME=v${majorEgkAndroid}.${minorEgkAndroid}.${patchEgkAndroid}" >> $GITHUB_ENV
 
