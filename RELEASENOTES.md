@@ -1,9 +1,10 @@
 ### New Features
 
+- update Kotlin to 2.0.21
+
 ---
 
 ### Bugfixes
 
-- hotfix for the findings Unsafe Cipher Mode Error in the Android PlayStore.
 
 ---
