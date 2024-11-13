@@ -52,11 +52,11 @@ jobs:
 
       - name: Extract version information
         run: |
-          majorEgkAndroid=$(grep '^\s*majorEgkAndroid\s*=' {print $2}' gradle.properties | sed 's/.*=\s*//')
+          majorEgkAndroid=$(grep '^\s*majorEgkAndroid\s*=' gradle.properties | sed 's/.*=\s*//')
           echo "Extracted majorSdk: $majorEgkAndroid"
-          minorEgkAndroid=$(grep '^\s*minorEgkAndroid\s*=' {print $2}' gradle.properties | sed 's/.*=\s*//')
+          minorEgkAndroid=$(grep '^\s*minorEgkAndroid\s*=' gradle.properties | sed 's/.*=\s*//')
           echo "Extracted minorSdk: $minorEgkAndroid"
-          patchEgkAndroid=$(grep '^\s*patchEgkAndroid\s*=' {print $2}' gradle.properties | sed 's/.*=\s*//')
+          patchEgkAndroid=$(grep '^\s*patchEgkAndroid\s*=' gradle.properties | sed 's/.*=\s*//')
           echo "Extracted patchSdk: $patchEgkAndroid"
           echo "MAJOR_EGK_API_VERSION=$majorEgkAndroid" >> $GITHUB_ENV
           echo "MINOR_EGK_API_VERSION=$minorEgkAndroid" >> $GITHUB_ENV
