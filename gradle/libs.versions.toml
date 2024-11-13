@@ -1,6 +1,6 @@
 [versions]
 dependencyCheckGradle = "10.0.3"
-gradleLicenseReport = "2.8"
+gradleLicenseReport = "2.9"
 kotlinxCoroutinesCore = "1.8.0"
 mockk = "1.13.5"
 snakeyaml = "2.3"
@@ -16,14 +16,6 @@ compileSdk = "34"
 minSDK = "30"
 targetSdk = "34"
 javaTarget = "17"
-
-## Egk API Android section start
-nameSpaceEgkiAndroid = "de.link4health.egk"
-libraryPackageNameEgkAndroid = "de.link4health.egk.api"
-majorEgkAndroid = "1"
-minorEgkAndroid = "0"
-patchEgkAndroid = "1"
-## Egk API Android section end
 
 kotlin = "2.0.0"
 
