@@ -97,6 +97,18 @@ jobs:
         run: |
           ./gradlew :egk:publishLink4HealthEgkLibraryPublicationToLink4HealthNexusRepository
 
+      - name: Verify SDK AAR
+        run: |
+          echo "Verifying existence of AAR..."
+          ls -la framework/build/outputs/aar/
+
+      - name: Upload SDK AAR
+        id: upload_sdk_aar
+        uses: actions/upload-artifact@v4
+        with:
+          name: Link4health-SDK-Release
+          path: framework/build/outputs/aar
+
       - name: Set Tag Name
         id: set_tag_name
         run: |
@@ -150,19 +162,32 @@ jobs:
           echo "$release_notes" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      - name: Debug current directory
+      - name: Download Release AAR
+        uses: actions/download-artifact@v4
+        with:
+          name: Link4health-SDK-Release
+          path: downloaded_files/
+
+      - name: Display structure of downloaded files
+        run: ls -R downloaded_files
+
+      - name: Check if AAB und mapping files exist
         run: |
-          echo "Current directory is:"
-          pwd
-          echo "Directory content is:"
-          ls -l
+          aar_path="downloaded_files/Link4health-SDK-${{ env.MAJOR_SDK_VERSION }}.${{ env.MINOR_SDK_VERSION }}.${{ env.PATCH_SDK_VERSION }}-${{ github.run_number }}-${{ env.SHORT_SHA }}.aar"
+          echo "Checking for AAR at path: $aar_path"
+          if [[ -f "$aar_path" ]]; then
+            echo "AAR file exists at $aar_path."
+          else
+            echo "::error::AAR file does not exist."
+            exit 1
+          fi
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            egk/build/outputs/aar/link4health-egk-library-${{ env.MAJOR_EGK_API_VERSION }}.${{ env.MINOR_EGK_API_VERSION }}.${{ env.PATCH_EGK_API_VERSION }}-${{ env.SHORT_SHA }}.aar
+            downloaded_files/*.aar
           body: ${{ env.RELEASE_NOTES }}
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
