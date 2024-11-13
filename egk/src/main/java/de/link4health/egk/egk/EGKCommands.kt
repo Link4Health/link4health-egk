@@ -13,7 +13,6 @@ import de.link4health.egk.identifier.ShortFileIdentifier
  */
 object EGKCommands {
 
-
     /**
      * Selects the root of the object system, either by selecting the parent folder or the AID.
      * Can also read the File Control Parameter (FCP) if specified.
@@ -43,7 +42,7 @@ object EGKCommands {
         return HealthCardCommand.read(
             ShortFileIdentifier(Ef.Atr.SFID),
             ne = expectedLength,
-            offset = 0
+            offset = 0,
         )
     }
 
@@ -57,7 +56,7 @@ object EGKCommands {
         return HealthCardCommand.read(
             ShortFileIdentifier(Ef.Version2.SFID),
             ne = expectedLength,
-            offset = 0
+            offset = 0,
         )
     }
 
@@ -71,7 +70,7 @@ object EGKCommands {
         return HealthCardCommand.read(
             ShortFileIdentifier(Ef.Gdo.SFID),
             ne = expectedLength,
-            offset = 0
+            offset = 0,
         )
     }
 
@@ -85,7 +84,7 @@ object EGKCommands {
         return HealthCardCommand.read(
             ShortFileIdentifier(Ef.CcaEgkCsE256.SFID),
             ne = expectedLength,
-            offset = 0
+            offset = 0,
         )
     }
 
@@ -99,10 +98,9 @@ object EGKCommands {
         return HealthCardCommand.read(
             ShortFileIdentifier(Ef.CeEgkAutCVCE256.SFID),
             ne = expectedLength,
-            offset = 0
+            offset = 0,
         )
     }
-
 
     /**
      * Reads the ESignCChAutR2048 file from the health card.
@@ -115,7 +113,7 @@ object EGKCommands {
         return HealthCardCommand.read(
             ShortFileIdentifier(Ef.ESignCChAutR2048.SFID),
             ne = expectedLength,
-            offset = 0
+            offset = 0,
         )
     }
 
@@ -130,7 +128,7 @@ object EGKCommands {
         return HealthCardCommand.read(
             ShortFileIdentifier(Ef.ESignCChAutE256.SFID),
             ne = expectedLength,
-            offset = 0
+            offset = 0,
         )
     }
 }

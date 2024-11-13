@@ -7,6 +7,7 @@ charset = utf-8
 indent_style = space
 indent_size = 4
 insert_final_newline = true
+max_line_length = 180
 
 # .Kts files
 [*.kts]
@@ -14,6 +15,7 @@ charset = utf-8
 indent_style = space
 indent_size = 4
 insert_final_newline = true
+max_line_length = 180
 
 # XML files
 [*.xml]
@@ -21,13 +23,7 @@ charset = utf-8
 indent_style = space
 indent_size = 4
 insert_final_newline = true
-
-# Groovy files
-[*.groovy]
-charset = utf-8
-indent_style = space
-indent_size = 4
-insert_final_newline = true
+max_line_length = 180
 
 # Properties files
 [*.properties]
@@ -35,6 +31,7 @@ charset = utf-8
 indent_style = space
 indent_size = 4
 insert_final_newline = true
+max_line_length = 180
 
 # JSON files
 [*.json]
@@ -42,3 +39,4 @@ charset = utf-8
 indent_style = space
 indent_size = 4
 insert_final_newline = true
+max_line_length = 180

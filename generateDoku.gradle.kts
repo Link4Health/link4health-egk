@@ -1,4 +1,5 @@
 import java.io.File
+import java.util.*
 import kotlin.text.Regex
 
 val pandoc = "pandoc"
@@ -47,7 +48,7 @@ tasks.register("generateDocIndexHtml") {
             val processedReleaseNotesHtml = processHtml(releaseNotesHtml)
             println("Generated Release Notes HTML: $processedReleaseNotesHtml")
 
-            val versionTag = getLatestGitTag()
+            val versionTag = "v${getVersionFromProperties()}"
             println("Version Tag: $versionTag")
 
             val versionDirectory = File(outputDirectory, "releases/$versionTag")
@@ -194,11 +195,15 @@ fun runCommandWithInput(input: String, vararg command: String): String {
     return process.inputStream.bufferedReader().use { it.readText() }.trim()
 }
 
-fun getLatestGitTag(): String {
-    val tags = runCommand("git", "tag", "-l", "--sort=-v:refname").lines()
-    if (tags.isNotEmpty()) {
-        return tags.first().trim()
-    } else {
-        throw RuntimeException("Keine Tags im Repository gefunden!")
+fun getVersionFromProperties(): String {
+    val propertiesFile = file("../gradle.properties")
+    if (propertiesFile.exists()) {
+        val properties = Properties()
+        propertiesFile.inputStream().use { properties.load(it) }
+        val major = properties.getProperty("majorEgkAndroid", "0")
+        val minor = properties.getProperty("minorEgkAndroid", "0")
+        val patch = properties.getProperty("patchEgkAndroid", "0")
+        return "$major.$minor.$patch"
     }
+    throw RuntimeException("gradle.properties file not found!")
 }

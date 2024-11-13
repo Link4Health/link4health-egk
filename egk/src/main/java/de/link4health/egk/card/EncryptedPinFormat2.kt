@@ -36,7 +36,6 @@ class EncryptedPinFormat2(pin: String) {
         private const val MIN_DIGIT = 0 // specSpec_COS#N008.000
         private const val MAX_DIGIT = 9 // specSpec_COS#N008.000
         private const val STRING_INT_OFFSET = 48
-
     }
 
     /**

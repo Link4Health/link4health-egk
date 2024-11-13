@@ -50,7 +50,7 @@ fun ICardChannel.retrieveCertificate(): ByteArray {
         FileIdentifier(Mf.Df.Esign.Ef.CchAutE256.FID),
         selectDfElseEf = false,
         requestFcp = true,
-        fcpLength = EXPECTED_LENGTH_WILDCARD_EXTENDED
+        fcpLength = EXPECTED_LENGTH_WILDCARD_EXTENDED,
     ).executeSuccessfulOn(this)
 
     val buffer = ByteArrayOutputStream()
@@ -69,7 +69,8 @@ fun ICardChannel.retrieveCertificate(): ByteArray {
         when (response.status) {
             ResponseStatus.SUCCESS -> {}
             ResponseStatus.END_OF_FILE_WARNING,
-            ResponseStatus.OFFSET_TOO_BIG -> break
+            ResponseStatus.OFFSET_TOO_BIG,
+            -> break
 
             else -> error("Couldn't read certificate: ${response.status}")
         }

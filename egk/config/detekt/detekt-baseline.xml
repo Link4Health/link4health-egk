@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:CommandApdu.kt$CommandApdu.Companion$fun ofOptions( cla: Int, ins: Int, p1: Int, p2: Int, data: ByteArray?, ne: Int?, ): CommandApdu</ID>
+    <ID>ImplicitDefaultLocale:CommandApdu.kt$CommandApdu$String.format("%02X", byte)</ID>
+    <ID>ImplicitDefaultLocale:ResponseApdu.kt$ResponseApdu$String.format("%02X", byte)</ID>
+    <ID>LongMethod:CommandApdu.kt$CommandApdu.Companion$fun ofOptions( cla: Int, ins: Int, p1: Int, p2: Int, data: ByteArray?, ne: Int?, ): CommandApdu</ID>
+    <ID>LongParameterList:CommandApdu.kt$CommandApdu.Companion$( cla: Int, ins: Int, p1: Int, p2: Int, data: ByteArray?, ne: Int?, )</ID>
+    <ID>LongParameterList:HealthCardCommand.kt$HealthCardCommand$( val expectedStatus: Map&lt;Int, ResponseStatus>, val cla: Int, val ins: Int, val p1: Int = 0, val p2: Int = 0, val data: ByteArray? = null, val ne: Int? = null, )</ID>
+    <ID>LongParameterList:HealthCardVersion2.kt$HealthCardVersion2$( /** * Information of C0 with version of filling instruction for version2 */ val fillingInstructionsVersion: ByteArray, // C0 /** * Information of C1 with version of card object system */ val objectSystemVersion: ByteArray, // C1 /** * Information of C2 with version of product identification object system */ val productIdentificationObjectSystemVersion: ByteArray, // C2 /** * Information of C4 with version of filling instruction for EF.GDO */ val fillingInstructionsEfGdoVersion: ByteArray, // C4 /** * Information of C5 with version of filling instruction for EF.ATR */ val fillingInstructionsEfAtrVersion: ByteArray, // C5 /** * Information of C6 with version of filling instruction for EF.KeyInfo * Only filled for gSMC-K and gSMC-KT */ val fillingInstructionsEfKeyInfoVersion: ByteArray, // C6 //only gSMC-K and gSMC-KT /** * Information of C3 with version of filling instruction for Environment Settings * Only filled for gSMC-K */ val fillingInstructionsEfEnvironmentSettingsVersion: ByteArray, // C3 //only gSMC-K /** * Information of C7 with version of filling instruction for EF.GDO */ val fillingInstructionsEfLoggingVersion: ByteArray, // C7 )</ID>
+    <ID>MagicNumber:ApplicationIdentifier.kt$ApplicationIdentifier$16</ID>
+    <ID>MagicNumber:EGKCommands.kt$EGKCommands$9</ID>
+    <ID>MagicNumber:FileIdentifier.kt$FileIdentifier$0x011C</ID>
+    <ID>MagicNumber:FileIdentifier.kt$FileIdentifier$0x1000</ID>
+    <ID>MagicNumber:FileIdentifier.kt$FileIdentifier$0x3FFF</ID>
+    <ID>MagicNumber:FileIdentifier.kt$FileIdentifier$0xFEFF</ID>
+    <ID>MagicNumber:FileIdentifier.kt$FileIdentifier$16</ID>
+    <ID>MagicNumber:FileIdentifier.kt$FileIdentifier$4</ID>
+    <ID>MagicNumber:FileIdentifier.kt$FileIdentifier$8</ID>
+    <ID>MagicNumber:GeneralAuthenticateCommand.kt$28</ID>
+    <ID>MagicNumber:HealthCardVersion2Extension.kt$16</ID>
+    <ID>MagicNumber:HealthCardVersion2Extension.kt$8</ID>
+    <ID>MagicNumber:ManageSecurityEnvironmentCommand.kt$3</ID>
+    <ID>MagicNumber:ManageSecurityEnvironmentCommand.kt$4</ID>
+    <ID>MagicNumber:ResponseApdu.kt$ResponseApdu$0xFF</ID>
+    <ID>MagicNumber:ResponseApdu.kt$ResponseApdu$8</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6281</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6282</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6283</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6285</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x62C1</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x62C7</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x62D0</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6300</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x63C0</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x63C1</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x63C2</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x63C3</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x63C4</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x63C5</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x63C6</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x63C7</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x63C8</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x63C9</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6400</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6581</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6981</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6982</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6983</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6985</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6986</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6988</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6A80</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6A81</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6A82</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6A88</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6B00</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x6D00</ID>
+    <ID>MagicNumber:ResponseStatus.kt$0x9000</ID>
+    <ID>MagicNumber:SecureMessaging.kt$SecureMessaging$255</ID>
+    <ID>MagicNumber:ShortFileIdentifier.kt$ShortFileIdentifier$16</ID>
+    <ID>MagicNumber:TrustedChannelPaceKeyExchange.kt$3</ID>
+    <ID>MagicNumber:TrustedChannelPaceKeyExchange.kt$5</ID>
+    <ID>SwallowedException:SecureMessagingTest.kt$SecureMessagingTest$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SecureMessagingTest.kt$SecureMessagingTest$e: Exception</ID>
+    <ID>TooManyFunctions:CommandApduTest.kt$CommandApduTest</ID>
+    <ID>TooManyFunctions:SecureMessaging.kt$SecureMessaging</ID>
+    <ID>TooManyFunctions:SecureMessagingTest.kt$SecureMessagingTest</ID>
+  </CurrentIssues>
+</SmellBaseline>

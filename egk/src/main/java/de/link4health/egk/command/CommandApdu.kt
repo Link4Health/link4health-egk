@@ -33,7 +33,7 @@ private fun encodeExpectedLengthShort(ne: Int): ByteArray =
             ne.toByte()
         } else {
             0x0
-        }
+        },
     )
 
 /**
@@ -58,7 +58,7 @@ class CommandApdu(
     apduBytes: ByteArray,
     val rawNc: Int,
     val rawNe: Int?,
-    val dataOffset: Int
+    val dataOffset: Int,
 ) {
     private val _apduBytes = apduBytes.copyOf()
 
@@ -98,7 +98,7 @@ class CommandApdu(
             ins: Int,
             p1: Int,
             p2: Int,
-            ne: Int?
+            ne: Int?,
         ) = ofOptions(cla = cla, ins = ins, p1 = p1, p2 = p2, data = null, ne = ne)
 
         /**
@@ -121,7 +121,7 @@ class CommandApdu(
             p1: Int,
             p2: Int,
             data: ByteArray?,
-            ne: Int?
+            ne: Int?,
         ): CommandApdu {
             require(!(cla < 0 || ins < 0 || p1 < 0 || p2 < 0)) {
                 "APDU header fields must not be less than 0"
@@ -180,7 +180,7 @@ class CommandApdu(
                     apduBytes = bytes.toByteArray(),
                     rawNc = nc,
                     rawNe = le,
-                    dataOffset = dataOffset
+                    dataOffset = dataOffset,
                 )
             } else {
                 // data empty
@@ -200,7 +200,7 @@ class CommandApdu(
                         apduBytes = bytes.toByteArray(),
                         rawNc = 0,
                         rawNe = ne,
-                        dataOffset = 0
+                        dataOffset = 0,
                     )
                 } else {
                     // case 1
@@ -208,7 +208,7 @@ class CommandApdu(
                         apduBytes = bytes.toByteArray(),
                         rawNc = 0,
                         rawNe = null,
-                        dataOffset = 0
+                        dataOffset = 0,
                     )
                 }
             }

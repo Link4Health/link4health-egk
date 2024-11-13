@@ -1,19 +1,19 @@
 /*
  * Copyright (c) 2024 gematik GmbH
- * 
+ *
  * Licensed under the EUPL, Version 1.2 or – as soon they will be approved by
  * the European Commission - subsequent versions of the EUPL (the Licence);
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  *     https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
- * 
+ *
  */
 
 package de.link4health.egk.card
@@ -96,7 +96,7 @@ class SecureMessaging(private val paceKey: PaceKey, private val ecbIv: ByteArray
 
         apduToEncrypt.copyOfRange(
             commandApdu.dataOffset,
-            commandApdu.dataOffset + commandApdu.rawNc
+            commandApdu.dataOffset + commandApdu.rawNc,
         )
             .takeIf { it.isNotEmpty() }
             ?.let {
@@ -119,7 +119,7 @@ class SecureMessaging(private val paceKey: PaceKey, private val ecbIv: ByteArray
             le = le,
             data = commandDataOutput,
             do8E = commandMacObject.taggedObject,
-            header = header
+            header = header,
         )
     }
 
@@ -135,7 +135,7 @@ class SecureMessaging(private val paceKey: PaceKey, private val ecbIv: ByteArray
         le: Int,
         data: ByteArrayOutputStream,
         do8E: DERTaggedObject,
-        header: ByteArray
+        header: ByteArray,
     ): CommandApdu {
         val tempData = data
         // write do8E to output
@@ -151,7 +151,9 @@ class SecureMessaging(private val paceKey: PaceKey, private val ecbIv: ByteArray
             } else {
                 EXPECTED_LENGTH_WILDCARD_EXTENDED
             }
-        } else EXPECTED_LENGTH_WILDCARD_EXTENDED
+        } else {
+            EXPECTED_LENGTH_WILDCARD_EXTENDED
+        }
 
         return CommandApdu.ofOptions(
             cla = header[0].toInt() and 0xFF,
@@ -159,7 +161,7 @@ class SecureMessaging(private val paceKey: PaceKey, private val ecbIv: ByteArray
             p1 = header[2].toInt() and 0xFF,
             p2 = header[3].toInt() and 0xFF,
             data = data.toByteArray(),
-            ne = ne
+            ne = ne,
         )
     }
 
@@ -187,7 +189,7 @@ class SecureMessaging(private val paceKey: PaceKey, private val ecbIv: ByteArray
         val responseMacObject = MacObject(
             commandOutput = responseDataOutput,
             kMac = paceKey.mac,
-            ssc = secureMessagingSSC
+            ssc = secureMessagingSSC,
         )
         checkMac(responseMacObject.mac, macBytes)
 
@@ -201,7 +203,7 @@ class SecureMessaging(private val paceKey: PaceKey, private val ecbIv: ByteArray
     private fun getResponseObjects(
         statusBytes: ByteArray,
         macBytes: ByteArray,
-        apduResponseBytes: ByteArray
+        apduResponseBytes: ByteArray,
     ): DataObject? {
         val inputStream = ByteArrayInputStream(apduResponseBytes)
 
@@ -250,7 +252,7 @@ class SecureMessaging(private val paceKey: PaceKey, private val ecbIv: ByteArray
 
     private fun createDecryptedResponse(
         statusBytes: ByteArray,
-        dataObject: DataObject?
+        dataObject: DataObject?,
     ): ResponseApdu {
         val outputStream = ByteArrayOutputStream()
         if (dataObject != null) {
@@ -273,7 +275,7 @@ class SecureMessaging(private val paceKey: PaceKey, private val ecbIv: ByteArray
     private fun getCipher(mode: Int): Cipher =
         Cipher.getInstance("AES/CBC/NoPadding", BCProvider).apply {
             val key: Key = SecretKeySpec(paceKey.enc, "AES")
-            val iv = createCipherIV()  // Hier verwenden Sie SSC als IV
+            val iv = createCipherIV() // Hier verwenden Sie SSC als IV
             val aps: AlgorithmParameterSpec = IvParameterSpec(iv)
 
             init(mode, key, aps)

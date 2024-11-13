@@ -59,7 +59,7 @@ fun HealthCardCommand.Companion.read(offset: Int, ne: Int): HealthCardCommand {
         ins = INS,
         p1 = p1,
         p2 = p2,
-        ne = ne
+        ne = ne,
     )
 }
 
@@ -87,6 +87,6 @@ fun HealthCardCommand.Companion.read(sfi: ShortFileIdentifier, offset: Int, ne: 
         ins = INS,
         p1 = SFI_MARKER + sfi.sfId,
         p2 = offset,
-        ne = ne
+        ne = ne,
     )
 }

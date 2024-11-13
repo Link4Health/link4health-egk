@@ -1,0 +1,93 @@
+name: Pull Request Guard
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+      - release
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout EGK
+        uses: actions/checkout@v4
+        with:
+          repository: Link4Health/link4health-egk-library
+          fetch-depth: 0
+
+      - name: EGK grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Set up git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Set up Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v3
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.gradle/gradle.properties
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: ''
+
+      - name: Install Android SDK
+        run: sdkmanager "platform-tools" "platforms;android-34"
+
+      - name: Create gradle.properties
+        run: |
+          mkdir -p ~/.gradle
+          echo "nvdApiKey=${{ secrets.NVD_API_KEY }}" >> ~/.gradle/gradle.properties
+          echo "contextUrl=${{ secrets.ARTIFACTS_CONTEXT_URL }}" >> ~/.gradle/gradle.properties
+          echo "nexusUsername=${{ secrets.NEXUS_USERNAME }}" >> ~/.gradle/gradle.properties
+          echo "nexusPassword=${{ secrets.NEXUS_PASSWORD }}" >> ~/.gradle/gradle.properties
+          echo "anonymous=false" >> ~/.gradle/gradle.properties
+          echo "org.gradle.internal.publish.checksums.insecure=true" >> ~/.gradle/gradle.properties
+
+      - name: Run tests
+        run: |
+          ./gradlew :egk:test
+
+      - name: Run detekt
+        run: |
+          ./gradlew :egk:detekt
+
+      - name: Run spotless
+        run: |
+          ./gradlew :egk:spotlessCheck
+
+      - name: Run lint
+        run: |
+          ./gradlew :egk:lintRelease
+
+      - name: Run build
+        run: |
+          ./gradlew :egk:build
+
+      - name: Upload Lint Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report
+          path: egk/build/reports/lint-results-release.html

@@ -23,5 +23,5 @@ enum class NfcCommunication {
     SELECT_ROOT,
     SELECT_INTERNAL,
     INTERNAL_AUTHENTICATION,
-    FINISH
+    FINISH,
 }

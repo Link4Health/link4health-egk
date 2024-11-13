@@ -1,7 +1,6 @@
 import de.ehex.settings.GITHUB_BUILD_NUMBER
-import de.ehex.settings.doesArtifactExist
 import de.ehex.settings.getGitHash
-import java.net.URISyntaxException
+import de.ehex.settings.nameSpace
 
 plugins {
     alias(libs.plugins.androidLibrary)
@@ -11,31 +10,57 @@ plugins {
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.dependency.check.gradle)
     alias(libs.plugins.gradle.license.report)
+    alias(libs.plugins.spotless)
     jacoco
     `maven-publish`
 }
 
 apply(from = "../generateDoku.gradle.kts")
 
+spotless {
+    kotlin {
+        target("**/*.kt")
+        targetExclude("**/build/**", "src/androidUnitTest/**/*.kt", "src/test/**/*.kt")
+        ktlint("0.48.0").editorConfigOverride(
+            mapOf(
+                "indent_size" to "4",
+                "continuation_indent_size" to "4",
+                "max_line_length" to "180",
+                "insert_final_newline" to "true",
+                "charset" to "utf-8",
+                "end_of_line" to "lf",
+            ),
+        )
+    }
+    kotlinGradle {
+        target("*.gradle.kts")
+        ktlint("0.48.0").editorConfigOverride(
+            mapOf(
+                "indent_size" to "4",
+                "continuation_indent_size" to "4",
+                "max_line_length" to "180",
+            ),
+        )
+    }
+}
+
 detekt {
     val configDir = "${project.layout.projectDirectory.asFile.absolutePath}/config/detekt"
     toolVersion = libs.versions.detekt.get()
-    config.setFrom(files("${configDir}/detekt.yml"))
+    config.setFrom(files("$configDir/detekt.yml"))
     // Optional: Define which directories should be scanned. If unspecified, detekt will scan all kotlin sources.
     source.from(
         files(
             "src/main/kotlin",
             "src/main/java",
-            "src/test/kotlin",
-            "src/test/java"
-        )
+        ),
     )
     // Build upon the default configuration provided by Detekt
     buildUponDefaultConfig = true
     // Optional: By default, Detekt does not fail the build when issues are found. Set this to true to fail the build.
     ignoreFailures = false
     // Optional: If set to true, ignores all rules in the baseline XML.
-    baseline = file("${configDir}/detekt-baseline.xml")
+    baseline = file("$configDir/detekt-baseline.xml")
 }
 
 jacoco {
@@ -63,7 +88,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/R\$*.class",
         "**/BuildConfig.*",
         "**/Manifest*.*",
-        "android/**/*.*"
+        "android/**/*.*",
     )
     val mainSrc = "${project.projectDir}/src/main/java"
 
@@ -137,20 +162,28 @@ licenseReport {
 }
 
 val injectVariable: MutableMap<String, String> = System.getenv()
-val buildNumber: String = GITHUB_BUILD_NUMBER
-val libraryPackageNameEgkAndroid: String = libs.versions.libraryPackageNameEgkAndroid.get()
-val majorVersion = libs.versions.majorEgkAndroid.get()
-val minorVersion = libs.versions.minorEgkAndroid.get()
-val patchVersion = libs.versions.patchEgkAndroid.get()
-val releaseType: String by project.extra
+val buildNumber: String = if (GITHUB_BUILD_NUMBER != "0") {
+    GITHUB_BUILD_NUMBER
+} else {
+    project.extra["buildNumber"] as String
+}
+val libraryPackageNameEgkAndroid: String by project.extra
+val majorEgkAndroid: String by project.extra
+val minorEgkAndroid: String by project.extra
+val patchEgkAndroid: String by project.extra
 
-val libraryVersion = "$majorVersion.$minorVersion.$patchVersion"
+val libraryVersionEgk = "$majorEgkAndroid.$minorEgkAndroid.$patchEgkAndroid"
 val gitHash = getGitHash()
 
 android {
-    namespace = libs.versions.nameSpaceEgkiAndroid.get()
+    namespace = nameSpace(project)
     compileSdk = libs.versions.compileSdk.get().toInt()
-
+    lint {
+        baseline = file("config/lint/lint-baseline.xml")
+        abortOnError = true
+        warningsAsErrors = true
+        checkDependencies = true
+    }
     defaultConfig {
         minSdk = libs.versions.minSDK.get().toInt()
 
@@ -166,10 +199,12 @@ android {
     }
 
     tasks.withType<com.android.build.gradle.tasks.BundleAar>().configureEach {
-        val type = if (releaseType.isEmpty()) {
-            "$libraryVersion-$gitHash"
+        val isDebugBuild = gradle.startParameter.taskNames.any { it.contains("assembleDebug") }
+        val buildTypeSuffix = if (isDebugBuild) "SNAPSHOT" else ""
+        val type = if (isDebugBuild) {
+            "$libraryVersionEgk-$buildNumber-$gitHash-$buildTypeSuffix"
         } else {
-            "$libraryVersion-$gitHash-$releaseType"
+            "$libraryVersionEgk-$buildNumber-$gitHash"
         }
         archiveFileName.set("${rootProject.name}-$type.aar")
     }
@@ -186,7 +221,6 @@ android {
     kotlinOptions {
         jvmTarget = libs.versions.javaTarget.get()
     }
-
 }
 
 dependencies {
@@ -210,12 +244,18 @@ publishing {
         create<MavenPublication>("Link4HealthEgkLibrary") {
             groupId = libraryPackageNameEgkAndroid
             artifactId = rootProject.name
-            version = if (releaseType.isEmpty()) {
-                "$libraryVersion-$gitHash"
+            version = if (isSnapshot()) {
+                "$libraryVersionEgk-$buildNumber-SNAPSHOT"
             } else {
-                "$libraryVersion-$gitHash-$releaseType"
+                libraryVersionEgk
             }
-            artifact("${layout.buildDirectory.get()}/outputs/aar/$artifactId-$version.aar") {
+            val artifactFileName = if (isSnapshot()) {
+                "${rootProject.name}-$libraryVersionEgk-$buildNumber-$gitHash-SNAPSHOT.aar"
+            } else {
+                "${rootProject.name}-$libraryVersionEgk-$buildNumber-$gitHash.aar"
+            }
+
+            artifact("${layout.buildDirectory.get()}/outputs/aar/$artifactFileName") {
                 extension = "aar"
             }
             pom {
@@ -245,73 +285,30 @@ publishing {
             }
         }
     }
-    val gitHubContextUrl: String? by extra
-    val githubUser: String? by extra
-    val githubToken: String? by extra
+    val contextUrl: String? by extra
+    val nexusUsername: String? by extra
+    val nexusPassword: String? by extra
     repositories {
         maven {
-            name = "GitHubPackages"
-            url = uri("$gitHubContextUrl/Link4Health/link4health-egk-library")
-            credentials {
-                username = githubUser
-                password = githubToken
-            }
-        }
-    }
-}
-
-afterEvaluate {
-    tasks.named("publishLink4HealthEgkLibraryPublicationToMavenLocal") {
-        dependsOn("clean")
-        mustRunAfter("clean")
-        dependsOn("bundleReleaseAar")
-    }
-    tasks.named("publishLink4HealthEgkLibraryPublicationToGitHubPackagesRepository") {
-        dependsOn("clean")
-        mustRunAfter("clean")
-        dependsOn("bundleReleaseAar")
-        dependsOn("checkEgkExistence") // Ensures `checkEgkExistence` runs before this task
-        onlyIf {
-            val artifactEgkExists = project.extra["artifactEgkExists"] as? Boolean ?: false
-            !artifactEgkExists
-        }
-        doFirst {
-            println("Publishing Link4HealthSharedApi as the artifact does not exist.")
-        }
-    }
-    tasks.named("bundleReleaseAar") {
-        mustRunAfter("clean")
-    }
-}
-
-tasks.register("checkEgkExistence") {
-    group = "verification"
-    doLast {
-        val repositoryUrl = "https://maven.pkg.github.com/Link4Health/link4health-egk-library"
-        val groupId = "de/link4health/egk/api"
-        val artifactId = "link4health-egk-library"
-        val version = if (releaseType.isEmpty()) {
-            "$libraryVersion-$gitHash"
-        } else {
-            "$libraryVersion-$gitHash-$releaseType"
-        }
-
-        val artifactPath = "$groupId/$artifactId/$version/$artifactId-$version.aar"
-
-        val username = project.findProperty("githubUser") as String
-        val token = project.findProperty("githubToken") as String
-
-        try {
-            println("Checking the existence of the artifact at: $repositoryUrl/$artifactPath")
-            val artifactEgkExists = doesArtifactExist(repositoryUrl, artifactPath, username, token)
-            project.extra["artifactEgkExists"] = artifactEgkExists
-            if (artifactEgkExists) {
-                println("The artifact already exists.")
+            name = "Link4HealthNexus"
+            url = if (isSnapshot()) {
+                uri("$contextUrl/link4health-snapshots")
             } else {
-                println("The artifact does not exist.")
+                uri("$contextUrl/link4health-releases")
             }
-        } catch (e: URISyntaxException) {
-            println("URISyntaxException: ${e.message}")
+            credentials {
+                username = nexusUsername
+                password = nexusPassword
+            }
         }
     }
+}
+
+fun isSnapshot(): Boolean {
+    val aarDir = File("${layout.buildDirectory.get()}/outputs/aar")
+    if (aarDir.exists() && aarDir.isDirectory) {
+        val files = aarDir.listFiles { _, name -> name.endsWith("SNAPSHOT.aar") }
+        return files?.isNotEmpty() ?: false
+    }
+    return false
 }
