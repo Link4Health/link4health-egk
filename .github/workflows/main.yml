@@ -100,14 +100,14 @@ jobs:
       - name: Verify SDK AAR
         run: |
           echo "Verifying existence of AAR..."
-          ls -la framework/build/outputs/aar/
+          ls -la egk/build/outputs/aar/
 
       - name: Upload SDK AAR
         id: upload_sdk_aar
         uses: actions/upload-artifact@v4
         with:
           name: Link4health-SDK-Release
-          path: framework/build/outputs/aar
+          path: egk/build/outputs/aar
 
       - name: Set Tag Name
         id: set_tag_name
