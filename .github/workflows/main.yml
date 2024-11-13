@@ -73,15 +73,21 @@ jobs:
       - name: Create gradle.properties
         run: |
           mkdir -p ~/.gradle
-          echo "githubUser=${{ secrets.PUBLISH_USER }}" >> ~/.gradle/gradle.properties
-          echo "githubToken=${{ secrets.RELEASE_GITHUB_TOKEN }}" >> ~/.gradle/gradle.properties
-          echo "releaseType=" >> ~/.gradle/gradle.properties
+          echo "nvdApiKey=${{ secrets.NVD_API_KEY }}" >> ~/.gradle/gradle.properties
+          echo "contextUrl=${{ secrets.ARTIFACTS_CONTEXT_URL }}" >> ~/.gradle/gradle.properties
+          echo "nexusUsername=${{ secrets.NEXUS_USERNAME }}" >> ~/.gradle/gradle.properties
+          echo "nexusPassword=${{ secrets.NEXUS_PASSWORD }}" >> ~/.gradle/gradle.properties
+          echo "anonymous=false" >> ~/.gradle/gradle.properties
           echo "org.gradle.internal.publish.checksums.insecure=true" >> ~/.gradle/gradle.properties
 
-      - name: Build and Publish Egk Release
-        run: |
-          ./gradlew :egk:publishLink4HealthEgkLibraryPublicationToGitHubPackagesRepository
 
+      - name: Build Egk Release
+        run: |
+          ./gradlew clean :egk:assembleRelease
+
+      - name: Publish Egk Release
+        run: |
+          ./gradlew :egk:publishLink4HealthEgkLibraryPublicationToLink4HealthNexusRepository
 
       - name: Set Tag Name
         id: set_tag_name
