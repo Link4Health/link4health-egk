@@ -111,7 +111,7 @@ jobs:
         id: create_pr
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.SDK_REPO_PAT }}
           sign-commits: true
           commit-message: "Update generated documentation"
           branch: update-pages-deployment
