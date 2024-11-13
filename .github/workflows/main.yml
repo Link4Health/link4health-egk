@@ -173,7 +173,7 @@ jobs:
 
       - name: Check if AAB und mapping files exist
         run: |
-          aar_path="downloaded_files/link4health-SDK-${{ env.MAJOR_SDK_VERSION }}.${{ env.MINOR_SDK_VERSION }}.${{ env.PATCH_SDK_VERSION }}-${{ github.run_number }}-${{ env.SHORT_SHA }}.aar"
+          aar_path="downloaded_files/link4health-SDK-${{ env.MAJOR_EGK_VERSION }}.${{ env.MINOR_EGK_VERSION }}.${{ env.PATCH_EGK_VERSION }}-${{ github.run_number }}-${{ env.SHORT_SHA }}.aar"
           echo "Checking for AAR at path: $aar_path"
           if [[ -f "$aar_path" ]]; then
             echo "AAR file exists at $aar_path."
