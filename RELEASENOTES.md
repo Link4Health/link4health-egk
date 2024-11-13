@@ -1,7 +1,5 @@
 # Release Notes
 
-## Version v1.0.1
-
 ### New Features
 
 ### Bugfixes
