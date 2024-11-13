@@ -115,7 +115,7 @@ jobs:
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "TAG_NAME=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
           else
-            TAG_NAME="v${{ env.MAJOR_EGK_API_VERSION }}.${{ env.MINOR_EGK_API_VERSION }}.${{ env.PATCH_EGK_API_VERSION }}"
+            TAG_NAME="v${{ env.MAJOR_EGK_VERSION }}.${{ env.MINOR_EGK_VERSION }}.${{ env.PATCH_EGK_VERSION }}"
             echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
           fi
 
