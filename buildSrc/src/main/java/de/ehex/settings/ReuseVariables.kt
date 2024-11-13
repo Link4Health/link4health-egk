@@ -1,6 +1,8 @@
 package de.ehex.settings
 
 import org.gradle.api.Project
+import java.io.File
+import java.io.FileInputStream
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URISyntaxException
@@ -9,6 +11,29 @@ import java.util.*
 
 val injectVariable: Map<String, String> = System.getenv()
 val GITHUB_BUILD_NUMBER: String = System.getenv("GITHUB_RUN_NUMBER") ?: "0"
+
+const val MISSING_GRADLE_PROPERTIES = "Missing entry nameSpace in gradle.properties"
+const val GRADLE_PROPERTIES_NOT_FOUND = "Missing gradle.properties file"
+const val CREATE_GRADLE_PROPERTIES_IN_DIRECTORY = "Create gradle.properties in project root directory"
+
+fun nameSpace(target: Project): String {
+    val file = File("${target.project.projectDir}")
+    val gradleProperties = File("${file.parent}/gradle.properties")
+    return if (gradleProperties.canRead()) {
+        val props = Properties()
+        props.load(FileInputStream(gradleProperties))
+        if (props.containsKey("nameSpace")) {
+            props["nameSpace"] as String
+        } else {
+            println(MISSING_GRADLE_PROPERTIES)
+            ""
+        }
+    } else {
+        println(GRADLE_PROPERTIES_NOT_FOUND)
+        println(CREATE_GRADLE_PROPERTIES_IN_DIRECTORY + file.parent)
+        ""
+    }
+}
 
 fun Project.getGitHash(): String {
     val dir = project.projectDir

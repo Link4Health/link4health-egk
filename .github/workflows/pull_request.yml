@@ -60,10 +60,10 @@ jobs:
         run: |
           mkdir -p ~/.gradle
           echo "nvdApiKey=${{ secrets.NVD_API_KEY }}" >> ~/.gradle/gradle.properties
-          echo "gitHubContextUrl=${{ secrets.ARTIFACTS_CONTEXT_URL }}" >> ~/.gradle/gradle.properties
-          echo "githubUser=${{ secrets.PUBLISH_USER }}" >> ~/.gradle/gradle.properties
-          echo "githubToken=${{ secrets.SDK_REPO_PAT }}" >> ~/.gradle/gradle.properties
-          echo "releaseType=SNAPSHOT" >> ~/.gradle/gradle.properties
+          echo "contextUrl=${{ secrets.ARTIFACTS_CONTEXT_URL }}" >> ~/.gradle/gradle.properties
+          echo "nexusUsername=${{ secrets.NEXUS_USERNAME }}" >> ~/.gradle/gradle.properties
+          echo "nexusPassword=${{ secrets.NEXUS_PASSWORD }}" >> ~/.gradle/gradle.properties
+          echo "anonymous=false" >> ~/.gradle/gradle.properties
           echo "org.gradle.internal.publish.checksums.insecure=true" >> ~/.gradle/gradle.properties
 
       - name: Run tests
