@@ -22,16 +22,16 @@ jobs:
       - name: Checkout Egk library
         uses: actions/checkout@v4
         with:
-          ref: 'develop'
+          ref: ${{ github.ref }}  # Dynamisch den Branch setzen
           fetch-depth: 0
 
       - name: Extract version information
         run: |
-          majorEgkAndroid=$(awk -F "=" '/majorEgkAndroid/ {print $2}' gradle/libs.versions.toml | xargs)
+          majorEgkAndroid=$(awk -F "=" '/majorEgkAndroid/ {print $2}' gradle.properties | xargs)
           echo "Extracted majorSdk: $majorEgkAndroid"
-          minorEgkAndroid=$(awk -F "=" '/minorEgkAndroid/ {print $2}' gradle/libs.versions.toml | xargs)
+          minorEgkAndroid=$(awk -F "=" '/minorEgkAndroid/ {print $2}' gradle.properties | xargs)
           echo "Extracted minorSdk: $minorEgkAndroid"
-          patchEgkAndroid=$(awk -F "=" '/patchEgkAndroid/ {print $2}' gradle/libs.versions.toml | xargs)
+          patchEgkAndroid=$(awk -F "=" '/patchEgkAndroid/ {print $2}' gradle.properties | xargs)
           echo "Extracted patchSdk: $patchEgkAndroid"
           echo "MAJOR_EGK_API_VERSION=$majorEgkAndroid" >> $GITHUB_ENV
           echo "MINOR_EGK_API_VERSION=$minorEgkAndroid" >> $GITHUB_ENV
@@ -67,17 +67,23 @@ jobs:
       - name: Create gradle.properties
         run: |
           mkdir -p ~/.gradle
-          echo "githubUser=${{ secrets.PUBLISH_USER }}" >> ~/.gradle/gradle.properties
-          echo "githubToken=${{ secrets.RELEASE_GITHUB_TOKEN }}" >> ~/.gradle/gradle.properties
-          echo "releaseType=SNAPSHOT" >> ~/.gradle/gradle.properties
+          echo "nvdApiKey=${{ secrets.NVD_API_KEY }}" >> ~/.gradle/gradle.properties
+          echo "contextUrl=${{ secrets.ARTIFACTS_CONTEXT_URL }}" >> ~/.gradle/gradle.properties
+          echo "nexusUsername=${{ secrets.NEXUS_USERNAME }}" >> ~/.gradle/gradle.properties
+          echo "nexusPassword=${{ secrets.NEXUS_PASSWORD }}" >> ~/.gradle/gradle.properties
+          echo "anonymous=false" >> ~/.gradle/gradle.properties
           echo "org.gradle.internal.publish.checksums.insecure=true" >> ~/.gradle/gradle.properties
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build and Publish Egk SNAPSHOT
+      - name: Build Egk SNAPSHOT
         run: |
-          ./gradlew :egk:publishLink4HealthEgkLibraryPublicationToGitHubPackagesRepository
+          ./gradlew clean :egk:assembleDebug
+
+      - name: Publish Egk SNAPSHOT
+        run: |
+          ./gradlew :egk:publishLink4HealthEgkLibraryPublicationToLink4HealthNexusRepository
 
       - name: Upload aar archive
         uses: actions/upload-artifact@v4
