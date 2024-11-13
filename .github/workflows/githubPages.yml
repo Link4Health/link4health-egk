@@ -7,7 +7,7 @@ on:
 
   # Triggered when the "Release build and publish ApiShared" workflow completes
   workflow_run:
-    workflows: [ "Create Release for eGK library" ]
+    workflows: [ "Build and publish Egk Release" ]
     types:
       - completed
 
@@ -44,6 +44,13 @@ jobs:
       - name: EGK grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
       - name: Set up git identity
         run: |
           git config --global user.name "github-actions[bot]"
@@ -51,6 +58,14 @@ jobs:
 
       - name: Set up Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v3
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: ''
+
+      - name: Install Android SDK
+        run: sdkmanager "platform-tools" "platforms;android-34"
 
       - name: Cache Gradle packages
         uses: actions/cache@v4
@@ -62,21 +77,6 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 17
-          cache: gradle
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          packages: ''
-
-      - name: Install Android SDK
-        run: sdkmanager "platform-tools" "platforms;android-34"
 
       - name: Create gradle.properties
         run: |
@@ -98,7 +98,7 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
           # Upload the docs directory
           path: 'docs'
@@ -114,8 +114,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           sign-commits: true
           commit-message: "Update generated documentation"
-          branch: pages-deployment
-          base: main
+          branch: update-pages-deployment
+          base: pages-deployment
           title: "Deploy Documentation and Reports"
           body: "Automated deployment of documentation and reports"
 
