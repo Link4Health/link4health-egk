@@ -1,5 +1,5 @@
 import java.io.File
-import java.util.*
+import java.util.Properties
 import kotlin.text.Regex
 
 val pandoc = "pandoc"
@@ -30,10 +30,6 @@ tasks.register("generateDocIndexHtml") {
 
             var readmeContent = readmeFile.readText()
             var releaseNotesContent = if (releaseNotesFile.exists()) releaseNotesFile.readText() else ""
-
-            // Anpassung des Markdown-Inhalts zur Unterstützung benutzerdefinierter Annotationen
-            readmeContent = processCustomAnnotations(readmeContent)
-            releaseNotesContent = processCustomAnnotations(releaseNotesContent)
 
             val readmeHtml = runCommandWithInput(input = readmeContent, pandoc, "-f", "markdown", "-t", "html")
             val processedReadmeHtml = processHtml(readmeHtml)
@@ -152,22 +148,6 @@ fun processHtml(html: String): String {
     return blockquoteNotePattern.replace(html) {
         """<blockquote class="caution"><p>${it.groupValues[1].trim()}</p></blockquote>"""
     }
-}
-
-// Methode zur Anpassung benutzerdefinierter Annotationen im Markdown-Inhalt
-fun processCustomAnnotations(markdown: String): String {
-    val annotationPatterns = listOf(
-        "CAUTION" to "caution",
-        "INFO" to "info"
-    )
-    var processedMarkdown = markdown
-    for ((annotation, cssClass) in annotationPatterns) {
-        val pattern = Regex("""\s*>\s*\[!$annotation]\s*\n>\s*(.*?)\s*\n""", RegexOption.DOT_MATCHES_ALL)
-        processedMarkdown = pattern.replace(processedMarkdown) {
-            """<blockquote class="$cssClass"><p>${it.groupValues[1].trim()}</p></blockquote>"""
-        }
-    }
-    return processedMarkdown
 }
 
 // Globale Definition der Methode copyFiles

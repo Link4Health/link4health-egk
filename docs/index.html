@@ -9,80 +9,145 @@
 <body>
 <div class="container">
     <h1 id="introduction">Introduction</h1>
-<p>Existing libraries for Android are unfortunately outdated. The commonly referenced repository is <a href="https://github.com/gematik/E-Rezept-App-Android">E-Rezept-App-Android</a> by the E-Rezept App.</p>
-<p>Currently, communication with the eGK via NFC relies partially on code from the E-Rezept App. To address this, sections of the E-Rezept App’s code have been extracted and repurposed into this Android library. This is intended to enhance functionality and usability for CardLink applications.</p>
-<p>The source code contained in this library aims to offer a robust solution by combining the traditional code base with relevant, up-to-date counterparts to maintain compatibility and extend support. We trust this library will be of great assistance in your Android development projects involving CardLink and the eGK.</p>
-———————————————————————————————————————
-<blockquote class="caution">
-<p>
-This piece of software is still under development. Until this note is gone - use with caution. :worried:
-</p>
-</blockquote>
-<blockquote class="caution">
-<p>
-<blockquote>
-If you use Android Studio or InteliJ IDEA you must install the Checkstyle-Plugin this is used to keep the code style clean.
-</p>
-</blockquote>
-<h2 id="requirements-installation-and-setup">Requirements Installation and Setup</h2>
-</blockquote>
-To use this library, you must fulfill the following requirements: <code>compileSdk = "34" minSDK = "30" targetSdk = "34" javaTarget = "17"</code>
-<blockquote class="caution">
-<p>
-<blockquote>
-As of March 2023, security patches will only be provided for Android versions 11 and above. That is why we provide this SDK only for <code>minSDK = 30</code>!
-</p>
-</blockquote>
-<h3 id="adding-dependencies-to-your-application">Adding Dependencies to Your Application</h3>
-</blockquote>
-<p>At the moment is not available over Maven Central, you can use the composite build feature from Gradle or build the library as aar To provide the link4health-eGK-library to your mavenLocal repository, you must run these Gradle tasks:</p>
-<p>Run this task first:</p>
-<p><code>./gradlew assembleRelease</code></p>
-<p>Run this task second:</p>
-<p><code>./gradlew publishLink4HealthEgkLibraryPublicationToMavenLocal</code></p>
-<h3 id="proguard-or-r8-setup">Proguard or R8 setup</h3>
-<p>The lirary provides a <code>consumer-rules.pro</code> file that contains the rules for this SDK. Your app does not need to set up any additional rules.</p>
-<h3 id="usage-examples-and-api-documentation">Usage examples and API Documentation</h3>
-<p>coming soon</p>
-<h3 id="troubleshooting-and-faq">Troubleshooting and FAQ</h3>
-<p>coming soon</p>
-<h3 id="versioning">Versioning</h3>
-<p>This library adheres to Semantic Versioning (SemVer) standards. Version numbers are structured as MAJOR.MINOR.PATCH. Each element increases numerically based on the following principles:</p>
-<ul>
-<li><p><strong>MAJOR:</strong> Introduces breaking changes, meaning that developers may need to alter their existing applications to ensure compatibility.</p></li>
-<li><p><strong>MINOR:</strong> Adds new features but remains backward-compatible. New additions won’t disrupt existing functionality.</p></li>
-<li><p><strong>PATCH:</strong> Implements backward-compatible bug fixes.</p></li>
-</ul>
-<p>Every version release is documented thoroughly, with details regarding the features and fixes it includes.</p>
-<p>When following SemVer principles, you should feel safe updating the SDK to any minor or patch version. This is because under SemVer, newer versions will not break your existing applications. All updates are carried out in a way that maintains the system’s predictability and adherence to Semantic Versioning standards.</p>
-<p>For further information on Semantic Versioning, you can visit the <a href="https://semver.org/">official website - SemVer</a>.</p>
-<h3 id="licensing">Licensing</h3>
-<p>The library is licensed under the European Union Public Licence (EUPL); every use of the library Sourcecode must be in compliance with the EUPL.</p>
-<p>You will find more details about the EUPL here: <a href="https://joinup.ec.europa.eu/collection/eupl">https://joinup.ec.europa.eu/collection/eupl</a></p>
-<p>Unless required by applicable law or agreed to in writing, software distributed under the EUPL is distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the EUPL for the specific language governing permissions and limitations under the License.</p>
-<h3 id="information">Information</h3>
-<p>This product uses the NVD API but is not endorsed or certified by the NVD.</p>
-<h3 id="github-pages">GitHub Pages</h3>
-<p>You can find the GitHub Page for this project here: <a href="https://link4health.github.io/link4health-egk-library/">link4health-egk-library</a></p>
+    <p>Existing libraries for Android are unfortunately outdated. The
+        commonly referenced repository is <a
+                href="https://github.com/gematik/E-Rezept-App-Android">E-Rezept-App-Android</a>
+        by the E-Rezept App.</p>
+    <p>Currently, communication with the eGK via NFC relies partially on
+        code from the E-Rezept App. To address this, sections of the E-Rezept
+        App’s code have been extracted and repurposed into this Android library.
+        This is intended to enhance functionality and usability for CardLink
+        applications.</p>
+    <p>The source code contained in this library aims to offer a robust
+        solution by combining the traditional code base with relevant,
+        up-to-date counterparts to maintain compatibility and extend support. We
+        trust this library will be of great assistance in your Android
+        development projects involving CardLink and the eGK.</p>
+    <hr/>
+    <blockquote>
+        <p>The Egk library is actively being developed. Updates may include new
+            features and important bug fixes to improve the stability and
+            functionality of your system.</p>
+    </blockquote>
+    <blockquote class="caution"><p></p>
+        <p>If you use Android Studio or InteliJ IDEA you must install the
+            Checkstyle-Plugin this is used to keep the code style clean.</p></blockquote>
+    <h2 id="requirements-installation">Requirements Installation</h2>
+    <p>To use this library, you must fulfill the following requirements:</p>
+    <pre><code>compileSdk = &quot;34&quot;
+minSDK = &quot;30&quot;
+targetSdk = &quot;34&quot;
+javaTarget = &quot;17&quot;</code></pre>
+    <blockquote class="caution"><p></p>
+        <p>As of March 2023, security patches will only be provided for Android
+            versions 11 and above. That is why we provide this SDK only for
+            <code>minSDK = 30</code>!</p></blockquote>
+    <h3 id="adding-dependencies-to-your-application">Adding Dependencies to
+        Your Application</h3>
+    <p>This library is not yet available on Maven Central. You can include
+        it in your project using the Link4Health Nexus repository. You can use
+        the composite build feature from Gradle or build the library as an
+        aar.</p>
+    <p><strong>1. Include the Link4Health Nexus Repository:</strong></p>
+    <p>Add the following to your project’s <code>settings.gradle.kts</code>
+        file:</p>
+    <div class="sourceCode" id="cb2"><pre
+            class="sourceCode kotlin"><code class="sourceCode kotlin"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dependencyResolutionManagement <span
+            class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    repositories <span class="op">{</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        mavenCentral<span class="op">()</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        google<span class="op">()</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        maven <span class="op">{</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>            name <span class="op">=</span> <span
+        class="st">&quot;Link4Health Nexus&quot;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>            url <span class="op">=</span> uri<span class="op">(</span><span class="st">&quot;</span><span
+        class="ss">$contextUrl</span><span class="st">/link4health-anonymous/&quot;</span><span class="op">)</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            mavenContent <span class="op">{</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                releasesOnly<span class="op">()</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre>
+    </div>
+    <p><strong>2. Add the Library Dependency:</strong></p>
+    <p>Add the following to your module’s <code>build.gradle.kts</code>
+        file:</p>
+    <div class="sourceCode" id="cb3"><pre
+            class="sourceCode kotlin"><code class="sourceCode kotlin"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dependencies <span
+            class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    implementation<span class="op">(</span><span class="st">&quot;de.link4health:link4health-egk-library:version&quot;</span><span
+        class="op">)</span> <span class="co">// Replace &#39;version&#39; with desired version.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre>
+    </div>
+    <p>To build the library locally and publish to your local Maven
+        repository, run these Gradle tasks:</p>
+    <ol type="1">
+        <li><strong>Build the library:</strong></li>
+    </ol>
+    <div class="sourceCode" id="cb4"><pre
+            class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./gradlew</span> assembleRelease</span></code></pre>
+    </div>
+    <ol start="2" type="1">
+        <li><strong>Publish to local Maven:</strong></li>
+    </ol>
+    <div class="sourceCode" id="cb5"><pre
+            class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./gradlew</span> publishLink4HealthEgkLibraryPublicationToMavenLocal</span></code></pre>
+    </div>
+    <h3 id="proguard-or-r8-setup">Proguard or R8 setup</h3>
+    <p>The library provides a <code>consumer-rules.pro</code> file that
+        contains the rules for this SDK. Your app does not need to set up any
+        additional rules.</p>
+    <h3 id="versioning">Versioning</h3>
+    <p>This library adheres to Semantic Versioning (SemVer) standards.
+        Version numbers are structured as MAJOR.MINOR.PATCH. Each element
+        increases numerically based on the following principles:</p>
+    <ul>
+        <li><p><strong>MAJOR:</strong> Introduces breaking changes, meaning that
+            developers may need to alter their existing applications to ensure
+            compatibility.</p></li>
+        <li><p><strong>MINOR:</strong> Adds new features but remains
+            backward-compatible. New additions won’t disrupt existing
+            functionality.</p></li>
+        <li><p><strong>PATCH:</strong> Implements backward-compatible bug
+            fixes.</p></li>
+    </ul>
+    <p>Every version release is documented thoroughly, with details
+        regarding the features and fixes it includes.</p>
+    <p>When following SemVer principles, you should feel safe updating the
+        SDK to any minor or patch version. This is because under SemVer, newer
+        versions will not break your existing applications. All updates are
+        carried out in a way that maintains the system’s predictability and
+        adherence to Semantic Versioning standards.</p>
+    <p>For further information on Semantic Versioning, you can visit the <a
+            href="https://semver.org/">official website - SemVer</a>.</p>
+    <h3 id="licensing">Licensing</h3>
+    <p>The library is licensed under the European Union Public Licence
+        (EUPL); every use of the library Sourcecode must be in compliance with
+        the EUPL.</p>
+    <p>You will find more details about the EUPL here: <a
+            href="https://joinup.ec.europa.eu/collection/eupl">https://joinup.ec.europa.eu/collection/eupl</a></p>
+    <p>Unless required by applicable law or agreed to in writing, software
+        distributed under the EUPL is distributed on an “AS IS” BASIS, WITHOUT
+        WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+        EUPL for the specific language governing permissions and limitations
+        under the License.</p>
+    <h3 id="information">Information</h3>
+    <p>This product uses the NVD API but is not endorsed or certified by the
+        NVD.</p>
+    <h3 id="github-pages">GitHub Pages</h3>
+    <p>You can find the GitHub Page for this project here: <a
+            href="https://link4health.github.io/link4health-egk-library/">link4health-egk-library</a></p>
     <h3>Documentation per Version</h3>
     <div id="documentation-versions">
         <div class="version-section">
-    <h4>Documentation for Version v1.0.1</h4>
-    <ul>
-        <li><a href="releases/v1.0.1/javaDoc/index.html">JavaDoc</a></li>
-        <li><a href="releases/v1.0.1/licenses/index.html">Licenses</a></li>
-        <li><a href="releases/v1.0.1/release-notes.html">Release Notes</a></li>
-    </ul>
-</div>
-<div class="version-section">
-    <h4>Documentation for Version v1.0.2</h4>
-    <ul>
-        <li><a href="releases/v1.0.2/javaDoc/index.html">JavaDoc</a></li>
-        <li><a href="releases/v1.0.2/licenses/index.html">Licenses</a></li>
-        <li><a href="releases/v1.0.2/release-notes.html">Release Notes</a></li>
-    </ul>
-</div>
-<!-- DOCUMENTATION_SECTIONS_PLACEHOLDER -->
+            <h4>Documentation for Version v1.0.1</h4>
+            <ul>
+                <li><a href="releases/v1.0.1/javaDoc/index.html">JavaDoc</a></li>
+                <li><a href="releases/v1.0.1/licenses/index.html">Licenses</a></li>
+                <li><a href="releases/v1.0.1/release-notes.html">Release Notes</a></li>
+            </ul>
+        </div>
+        <!-- DOCUMENTATION_SECTIONS_PLACEHOLDER -->
     </div>
 </div>
 </body>
