@@ -18,10 +18,12 @@ up-to-date counterparts to maintain compatibility and extend support. We trust t
 
 :::
 
+::: {.caution}
 > [!CAUTION]
 > 
 > If you use Android Studio or InteliJ IDEA you must install the Checkstyle-Plugin this is used to keep the code style clean.
 
+:::
 
 ## Requirements Installation
 
@@ -34,9 +36,12 @@ targetSdk = "34"
 javaTarget = "17"
 ```
 
+::: {.caution}
 > [!CAUTION]
 > 
 > As of March 2023, security patches will only be provided for Android versions 11 and above. That is why we provide this SDK only for `minSDK = 30`!
+
+:::
 
 ### Adding Dependencies to Your Application
 

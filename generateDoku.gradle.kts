@@ -32,8 +32,6 @@ tasks.register("generateDocIndexHtml") {
             val releaseNotesContent = if (releaseNotesFile.exists()) releaseNotesFile.readText() else ""
 
             val readmeHtml = runCommandWithInput(input = readmeContent, pandoc, "-f", "markdown", "-t", "html")
-            val processedReadmeHtml = processHtml(readmeHtml)
-            println("Generated README HTML: $processedReadmeHtml")
 
             val releaseNotesHtml = if (releaseNotesContent.isNotEmpty()) {
                 runCommandWithInput(input = releaseNotesContent, pandoc, "-f", "markdown", "-t", "html")
@@ -41,8 +39,6 @@ tasks.register("generateDocIndexHtml") {
                 println("RELEASENOTES.md file does not exist!")
                 ""
             }
-            val processedReleaseNotesHtml = processHtml(releaseNotesHtml)
-            println("Generated Release Notes HTML: $processedReleaseNotesHtml")
 
             val versionTag = "v${getVersionFromProperties()}"
             println("Version Tag: $versionTag")
@@ -91,7 +87,7 @@ tasks.register("generateDocIndexHtml") {
                 ""
             }
 
-            var updatedContent = templateContent.replace("<!-- README_CONTENT_PLACEHOLDER -->", processedReadmeHtml)
+            var updatedContent = templateContent.replace("<!-- README_CONTENT_PLACEHOLDER -->", readmeHtml)
             updatedContent = updatedContent.replace("<!-- DOCUMENTATION_SECTIONS_PLACEHOLDER -->", "$existingVersions$newVersionSection")
 
             println("Final Content of index.html before writing:\n$updatedContent")
@@ -116,7 +112,7 @@ tasks.register("generateDocIndexHtml") {
                 <div class="container">
                     <a href="../../index.html">Back to Documentation Overview</a>
                     <h1>Release Notes $versionTag</h1>
-                    $processedReleaseNotesHtml
+                    $releaseNotesHtml
                 </div>
                 </body>
                 </html>
@@ -131,13 +127,6 @@ tasks.register("generateDocIndexHtml") {
     }
 }
 
-
-fun processHtml(html: String): String {
-    val blockquoteNotePattern = Regex("""<blockquote>\s*<p>\[!CAUTION\](.*?)<\/p>\s*<\/blockquote>""", RegexOption.DOT_MATCHES_ALL)
-    return blockquoteNotePattern.replace(html) {
-        """<blockquote class="caution"><p>${it.groupValues[1].trim()}</p></blockquote>"""
-    }
-}
 
 // Globale Definition der Methode copyFiles
 fun copyFiles(sourceDir: String, destDir: String) {
