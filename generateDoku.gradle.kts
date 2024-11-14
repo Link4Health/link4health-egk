@@ -19,7 +19,7 @@ tasks.register("generateDocIndexHtml") {
 
     doLast {
         try {
-            println("Überprüfung ob 'pandoc' installiert ist:")
+            println("Checking if 'pandoc' is installed:")
             val pandocVersionOutput = runCommand(pandoc, "--version")
             println("Pandoc Version: $pandocVersionOutput")
 
@@ -28,8 +28,8 @@ tasks.register("generateDocIndexHtml") {
             println("Template File: ${templateFile.absolutePath}")
             println("Output File: ${outputFile.absolutePath}")
 
-            var readmeContent = readmeFile.readText()
-            var releaseNotesContent = if (releaseNotesFile.exists()) releaseNotesFile.readText() else ""
+            val readmeContent = readmeFile.readText()
+            val releaseNotesContent = if (releaseNotesFile.exists()) releaseNotesFile.readText() else ""
 
             val readmeHtml = runCommandWithInput(input = readmeContent, pandoc, "-f", "markdown", "-t", "html")
             val processedReadmeHtml = processHtml(readmeHtml)
@@ -51,13 +51,12 @@ tasks.register("generateDocIndexHtml") {
             versionDirectory.mkdirs() // Ensure the directory is created
             println("Version Directory: ${versionDirectory.absolutePath}")
 
-            // Debugging-Ausgaben für den Kopiervorgang
-            println("Quelle der JavaDoc-Dateien: build/dokka/html")
-            println("Ziel für die JavaDoc-Dateien: $versionDirectory/javaDoc")
+            println("Source for JavaDoc files: build/dokka/html")
+            println("Target for JavaDoc files: $versionDirectory/javaDoc")
             copyFiles("egk/build/dokka/html", "$versionDirectory/javaDoc")
 
-            println("Quelle der Lizenzberichte: egk/build/reports/dependency-license")
-            println("Ziel für die Lizenzberichte: $versionDirectory/licenses")
+            println("Source for license reports: egk/build/reports/dependency-license")
+            println("Target for license reports: $versionDirectory/licenses")
             copyFiles("egk/build/reports/dependency-license", "$versionDirectory/licenses")
 
             val javadocPath = "releases/$versionTag/javaDoc/index.html"
@@ -79,36 +78,27 @@ tasks.register("generateDocIndexHtml") {
                 </div>
             """.trimIndent()
 
-            var existingDocument = if (outputFile.exists()) {
-                println("Output file exists, reading its content.")
-                outputFile.readText()
+            val templateContent = templateFile.readText()
+
+            val existingIndexContent = if (outputFile.exists()) outputFile.readText() else ""
+            val documentationVersionsRegex = Regex("""<div id="documentation-versions">(.*?)</div>""", RegexOption.DOT_MATCHES_ALL)
+            val existingVersionsMatch = documentationVersionsRegex.find(existingIndexContent)
+            val existingVersions = existingVersionsMatch?.groupValues?.get(1) ?: ""
+
+            val newVersionSection = if (!existingVersions.contains(versionTag)) {
+                "$versionSection\n"
             } else {
-                println("Using the template file as output file does not exist.")
-                templateFile.readText()
+                ""
             }
 
-            println("Initial Content of index.html before replacement:\n$existingDocument")
+            var updatedContent = templateContent.replace("<!-- README_CONTENT_PLACEHOLDER -->", processedReadmeHtml)
+            updatedContent = updatedContent.replace("<!-- DOCUMENTATION_SECTIONS_PLACEHOLDER -->", "$existingVersions$newVersionSection")
 
-            // Check if the documentation for this tag already exists
-            if (!existingDocument.contains(versionSection)) {
-                existingDocument = existingDocument.replace("<!-- README_CONTENT_PLACEHOLDER -->", processedReadmeHtml)
-                existingDocument =
-                    existingDocument.replace("<!-- DOCUMENTATION_SECTIONS_PLACEHOLDER -->", "$versionSection\n<!-- DOCUMENTATION_SECTIONS_PLACEHOLDER -->")
-            } else {
-                println("Documentation for version $versionTag already exists in index.html")
-            }
+            println("Final Content of index.html before writing:\n$updatedContent")
 
-            println("Final Content of index.html before writing:\n$existingDocument")
+            outputFile.writeText(updatedContent)
+            println("Updated index.html file written to: ${outputFile.absolutePath}")
 
-            if (!outputFile.exists()) {
-                println("Output file does not exist. It will be created.")
-            }
-
-            // Writing final content to index.html
-            outputFile.writeText(existingDocument)
-            println("Updated index.html file written at: ${outputFile.absolutePath}")
-
-            // Speichern der Release-Notes HTML Datei
             val releaseNotesFullPath = File(outputDirectory, releaseNotesPath)
             println("Creating release notes directory if it doesn't exist: ${releaseNotesFullPath.parentFile}")
             releaseNotesFullPath.parentFile.mkdirs() // Ensure the parent directory is created
@@ -132,7 +122,7 @@ tasks.register("generateDocIndexHtml") {
                 </html>
             """.trimIndent()
             releaseNotesFullPath.writeText(releaseNotesHtmlFull)
-            println("Release notes HTML file written at: ${releaseNotesFullPath.absolutePath}")
+            println("Release notes HTML file written to: ${releaseNotesFullPath.absolutePath}")
 
         } catch (e: Exception) {
             println("An error occurred: ${e.message}")
@@ -141,9 +131,8 @@ tasks.register("generateDocIndexHtml") {
     }
 }
 
-// Methode zur Anpassung des generierten HTMLs
+
 fun processHtml(html: String): String {
-    // Beispiel: Hinzufügen der Klasse "note" zu bestimmten Blockquotes
     val blockquoteNotePattern = Regex("""<blockquote>\s*<p>\[!CAUTION\](.*?)<\/p>\s*<\/blockquote>""", RegexOption.DOT_MATCHES_ALL)
     return blockquoteNotePattern.replace(html) {
         """<blockquote class="caution"><p>${it.groupValues[1].trim()}</p></blockquote>"""
