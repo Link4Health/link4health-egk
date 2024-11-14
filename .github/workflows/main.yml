@@ -145,7 +145,7 @@ jobs:
       - name: Push Tag to Repository
         id: push_tag
         env:
-          GH_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.SDK_REPO_PAT }}
         run: |
           TAG_NAME="${{ env.TAG_NAME }}"
           git push origin "$TAG_NAME" --force
@@ -190,4 +190,4 @@ jobs:
             downloaded_files/*.aar
           body: ${{ env.RELEASE_NOTES }}
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.SDK_REPO_PAT }}
