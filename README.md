@@ -13,18 +13,20 @@ up-to-date counterparts to maintain compatibility and extend support. We trust t
 
 ---------------------------------------------------------------------------------------------------------------------
 
-> [!CAUTION]
-> This piece of software is still under development. Until this note is gone - use with caution. :worried:
+::: {.info}
+> The Egk library is actively being developed. Updates may include new features and important bug fixes to improve the stability and functionality of your system.
 
+:::
 
 > [!CAUTION]
 > 
 > If you use Android Studio or InteliJ IDEA you must install the Checkstyle-Plugin this is used to keep the code style clean.
 
 
-## Requirements Installation and Setup
+## Requirements Installation
 
 To use this library, you must fulfill the following requirements:
+
 ```
 compileSdk = "34"
 minSDK = "30"
@@ -38,29 +40,57 @@ javaTarget = "17"
 
 ### Adding Dependencies to Your Application
 
-At the moment is not available over Maven Central, you can use the composite build feature from Gradle or build the library as aar
-To provide the link4health-eGK-library to your mavenLocal repository, you must run these Gradle tasks:
+This library is not yet available on Maven Central. You can include it in your project using the Link4Health Nexus repository. You can use the composite build feature from Gradle or build the library as an aar.
 
-Run this task first:
+**1. Include the Link4Health Nexus Repository:**
 
-```./gradlew assembleRelease```
+Add the following to your project's `settings.gradle.kts` file:
 
-Run this task second:
+```kotlin
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        google()
+        maven {
+            name = "Link4Health Nexus"
+            url = uri("$contextUrl/link4health-anonymous/")
+            mavenContent {
+                releasesOnly()
+            }
+        }
+    }
+}
+```
 
-```./gradlew publishLink4HealthEgkLibraryPublicationToMavenLocal```
+**2. Add the Library Dependency:**
+
+Add the following to your module's `build.gradle.kts` file:
+
+```kotlin
+dependencies {
+    implementation("de.link4health:link4health-egk-library:version") // Replace 'version' with desired version.
+}
+
+```
+
+To build the library locally and publish to your local Maven repository, run these Gradle tasks:
+
+1. **Build the library:**
+
+```bash
+./gradlew assembleRelease
+```
+
+2. **Publish to local Maven:**
+
+```bash
+./gradlew publishLink4HealthEgkLibraryPublicationToMavenLocal
+```
 
 
 ### Proguard or R8 setup
 
-The lirary provides a `consumer-rules.pro` file that contains the rules for this SDK. Your app does not need to set up any additional rules.
-
-### Usage examples and API Documentation
-
-coming soon
-
-### Troubleshooting and FAQ
-
-coming soon
+The library provides a `consumer-rules.pro` file that contains the rules for this SDK. Your app does not need to set up any additional rules.
 
 ### Versioning
 

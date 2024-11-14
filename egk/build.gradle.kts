@@ -128,7 +128,7 @@ tasks.register<Jar>("dokkaJavadocJar") {
 }
 
 licenseReport {
-    // By default this plugin will collect the union of all licenses from
+    // By default, this plugin will collect the union of all licenses from
     // the immediate pom and the parent poms. If your legal team thinks this
     // is too liberal, you can restrict collected licenses to only include the
     // those found in the immediate pom file
