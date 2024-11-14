@@ -45,15 +45,7 @@ code {
     border-radius: 4px;
 }
 
-blockquote {
-    background: #f9f9f9;
-    border-left: 5px solid #ccc;
-    margin: 1em 0;
-    padding: 10px 20px;
-    color: #666;
-}
-
-blockquote.caution {
+.caution {
     background: #f44336;
     border-left: 8px solid #3498db;
     color: white;
@@ -64,7 +56,7 @@ blockquote.caution {
     font-style: italic;
 }
 
-blockquote.info {
+.info {
     background: #d1ecf1;
     border-left: 5px solid #bee5eb;
     color: #0c5460;
