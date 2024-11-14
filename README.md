@@ -21,9 +21,10 @@ up-to-date counterparts to maintain compatibility and extend support. We trust t
 > If you use Android Studio or InteliJ IDEA you must install the Checkstyle-Plugin this is used to keep the code style clean.
 
 
-## Requirements Installation and Setup
+## Requirements Installation
 
 To use this library, you must fulfill the following requirements:
+
 ```
 compileSdk = "34"
 minSDK = "30"
