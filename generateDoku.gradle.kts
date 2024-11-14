@@ -1,5 +1,5 @@
 import java.io.File
-import java.util.*
+import java.util.Properties
 import kotlin.text.Regex
 
 val pandoc = "pandoc"
