@@ -38,7 +38,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Link4Health/link4health-egk-library
-          ref: 'main'  # Ensure the main branch is checked out
+          ref: pages-deployment
           fetch-depth: 0  # Fetch all history for all tags and branches
 
       - name: EGK grant execute permission for gradlew
@@ -93,19 +93,6 @@ jobs:
 
       - name: Generate Documentation Index HTML
         run: ./gradlew generateDocIndexHtml
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload the docs directory
-          path: 'docs'
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
 
       - name: Create Pull Request
         id: create_pr

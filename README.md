@@ -13,8 +13,10 @@ up-to-date counterparts to maintain compatibility and extend support. We trust t
 
 ---------------------------------------------------------------------------------------------------------------------
 
-
+::: {.info}
 > The Egk library is actively being developed. Updates may include new features and important bug fixes to improve the stability and functionality of your system.
+
+:::
 
 > [!CAUTION]
 > 
