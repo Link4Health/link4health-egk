@@ -198,7 +198,6 @@ jobs:
 
       - name: Generate Documentation Index HTML
         run: |
-          cd api-shared || exit 1
           ./gradlew generateDocIndexHtml
 
       - name: Setup Pages
