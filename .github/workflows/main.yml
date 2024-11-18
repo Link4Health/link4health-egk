@@ -18,6 +18,11 @@ permissions:
   id-token: write
   pull-requests: write  # Permissions to create and manage pull requests
 
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   release:
     environment:
@@ -69,7 +74,8 @@ jobs:
           echo "MINOR_EGK_VERSION=$minorEgkAndroid" >> $GITHUB_ENV
           echo "PATCH_EGK_VERSION=$patchEgkAndroid" >> $GITHUB_ENV
           echo "SHORT_SHA=$(echo ${{ github.sha }} | cut -c 1-7)" >> $GITHUB_ENV
-          echo "TAG_NAME=v${majorEgkAndroid}.${minorEgkAndroid}.${patchEgkAndroid}" >> $GITHUB_ENV
+          TAG_NAME="v${majorApp}.${minorApp}.${patchApp}"
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
 
       - name: Cache Gradle packages
         uses: actions/cache@v4
@@ -131,13 +137,12 @@ jobs:
           echo "RELEASE_RESPONSE=$(<response.json jq -c)" >> $GITHUB_ENV
 
       - name: Delete existing release
+        uses: cb80/delrel@latest
         if: env.RELEASE_RESPONSE != 'null'
-        run: |
-          RELEASE_ID=$(echo '${{ env.RELEASE_RESPONSE }}' | jq -r '.id')
-          if [[ "$RELEASE_ID" != "null" && "$RELEASE_ID" != "" ]]; then
-            echo "Deleting release $RELEASE_ID"
-            curl -X DELETE -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID"
-          fi
+        with:
+          tag: ${{ env.TAG_NAME }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create or Update Git Tag
         id: create_tag
@@ -195,37 +200,37 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.SDK_REPO_PAT }}
 
-#      # Schritte für die Veröffentlichung auf GitHub Pages
-#      - name: Install Pandoc
-#        run: brew install pandoc
-#
-#      - name: Generate Documentation Index HTML
-#        run: |
-#          ./gradlew generateDocIndexHtml
-#
-#      - name: Setup Pages
-#        uses: actions/configure-pages@v5
-#
-#      - name: Upload artifact
-#        uses: actions/upload-pages-artifact@v3
-#        with:
-#          # Upload the docs directory
-#          path: 'docs'
-#
-#      - name: Deploy to GitHub Pages
-#        id: deployment
-#        uses: actions/deploy-pages@v4
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.SDK_REPO_PAT }}
-#
-#      - name: Create Pull Request for Documentation Updates
-#        id: create_pr_docs
-#        uses: peter-evans/create-pull-request@v7
-#        with:
-#          token: ${{ secrets.SDK_REPO_PAT }}
-#          sign-commits: true
-#          commit-message: "Update generated documentation"
-#          branch: pages-deployment
-#          base: main
-#          title: "Deploy Documentation and Reports"
-#          body: "Automated deployment of documentation and reports"
+      # Schritte für die Veröffentlichung auf GitHub Pages
+      - name: Install Pandoc
+        run: brew install pandoc
+
+      - name: Generate Documentation Index HTML
+        run: |
+          ./gradlew generateDocIndexHtml
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload the docs directory
+          path: 'docs'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.SDK_REPO_PAT }}
+
+      - name: Create Pull Request for Documentation Updates
+        id: create_pr_docs
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.SDK_REPO_PAT }}
+          sign-commits: true
+          commit-message: "Update generated documentation"
+          branch: pages-deployment
+          base: main
+          title: "Deploy Documentation and Reports"
+          body: "Automated deployment of documentation and reports"
