@@ -29,12 +29,11 @@ up-to-date counterparts to maintain compatibility and extend support. We trust t
 
 To use this library, you must fulfill the following requirements:
 
-```
-compileSdk = "34"
-minSDK = "30"
-targetSdk = "34"
-javaTarget = "17"
-```
+- compileSdk = "34"
+- minSDK = "30"
+- targetSdk = "34"
+- javaTarget = "17"
+
 
 ::: {.caution}
 > [!CAUTION]
