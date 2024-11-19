@@ -198,7 +198,7 @@ jobs:
         id: create_pr_docs
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.SDK_REPO_PAT }}
           sign-commits: true
           commit-message: "Update generated documentation"
           branch: update-gh-pages
@@ -211,4 +211,4 @@ jobs:
         run: |
           gh pr merge ${{ steps.create_pr.outputs.pull-request-url }} --merge --admin
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.SDK_REPO_PAT }}
