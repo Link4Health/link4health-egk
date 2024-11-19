@@ -205,3 +205,10 @@ jobs:
           base: gh-pages
           title: "Deploy Documentation and Reports"
           body: "Automated deployment of documentation and reports"
+
+      - name: Merge Pull Request
+        if: steps.create_pr_docs.outputs.pull-request-url != ''
+        run: |
+          gh pr merge ${{ steps.create_pr.outputs.pull-request-url }} --merge --admin
+        env:
+          GITHUB_TOKEN: ${{ secrets.SDK_REPO_PAT }}
