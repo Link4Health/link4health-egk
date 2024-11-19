@@ -184,10 +184,13 @@ jobs:
         with:
           # Upload the docs directory
           path: 'docs'
+          name: 'documentation-artifact-${{ github.run_id }}'
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: 'documentation-artifact-${{ github.run_id }}'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -199,6 +202,6 @@ jobs:
           sign-commits: true
           commit-message: "Update generated documentation"
           branch: main
-          base: pages-deployment
+          base: gh-pages
           title: "Deploy Documentation and Reports"
           body: "Automated deployment of documentation and reports"
