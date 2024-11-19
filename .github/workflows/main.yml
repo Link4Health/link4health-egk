@@ -216,6 +216,7 @@ jobs:
         with:
           # Upload the docs directory
           path: 'docs'
+          name: 'documentation-artifact'
 
       - name: Deploy to GitHub Pages
         id: deployment
