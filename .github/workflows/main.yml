@@ -211,4 +211,4 @@ jobs:
         run: |
           gh pr merge ${{ steps.create_pr.outputs.pull-request-url }} --merge --admin
         env:
-          GITHUB_TOKEN: ${{ secrets.SDK_REPO_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
