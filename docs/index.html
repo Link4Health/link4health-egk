@@ -31,19 +31,29 @@ features and important bug fixes to improve the stability and
 functionality of your system.</p>
 </blockquote>
 </div>
-<blockquote class="caution"><p></p>
+<div class="caution">
+<blockquote>
+<p>[!CAUTION]</p>
 <p>If you use Android Studio or InteliJ IDEA you must install the
-Checkstyle-Plugin this is used to keep the code style clean.</p></blockquote>
+Checkstyle-Plugin this is used to keep the code style clean.</p>
+</blockquote>
+</div>
 <h2 id="requirements-installation">Requirements Installation</h2>
 <p>To use this library, you must fulfill the following requirements:</p>
-<pre><code>compileSdk = &quot;34&quot;
-minSDK = &quot;30&quot;
-targetSdk = &quot;34&quot;
-javaTarget = &quot;17&quot;</code></pre>
-<blockquote class="caution"><p></p>
+<ul>
+<li>compileSdk = “34”</li>
+<li>minSDK = “30”</li>
+<li>targetSdk = “34”</li>
+<li>javaTarget = “17”</li>
+</ul>
+<div class="caution">
+<blockquote>
+<p>[!CAUTION]</p>
 <p>As of March 2023, security patches will only be provided for Android
 versions 11 and above. That is why we provide this SDK only for
-<code>minSDK = 30</code>!</p></blockquote>
+<code>minSDK = 30</code>!</p>
+</blockquote>
+</div>
 <h3 id="adding-dependencies-to-your-application">Adding Dependencies to
 Your Application</h3>
 <p>This library is not yet available on Maven Central. You can include
@@ -53,39 +63,39 @@ aar.</p>
 <p><strong>1. Include the Link4Health Nexus Repository:</strong></p>
 <p>Add the following to your project’s <code>settings.gradle.kts</code>
 file:</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode kotlin"><code class="sourceCode kotlin"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dependencyResolutionManagement <span class="op">{</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    repositories <span class="op">{</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        mavenCentral<span class="op">()</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        google<span class="op">()</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        maven <span class="op">{</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>            name <span class="op">=</span> <span class="st">&quot;Link4Health Nexus&quot;</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>            url <span class="op">=</span> uri<span class="op">(</span><span class="st">&quot;</span><span class="ss">$contextUrl</span><span class="st">/link4health-anonymous/&quot;</span><span class="op">)</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            mavenContent <span class="op">{</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                releasesOnly<span class="op">()</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode kotlin"><code class="sourceCode kotlin"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>dependencyResolutionManagement <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    repositories <span class="op">{</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>        mavenCentral<span class="op">()</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        google<span class="op">()</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        maven <span class="op">{</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>            name <span class="op">=</span> <span class="st">&quot;Link4Health Nexus&quot;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>            url <span class="op">=</span> uri<span class="op">(</span><span class="st">&quot;</span><span class="ss">$contextUrl</span><span class="st">/link4health-anonymous/&quot;</span><span class="op">)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>            mavenContent <span class="op">{</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                releasesOnly<span class="op">()</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p><strong>2. Add the Library Dependency:</strong></p>
 <p>Add the following to your module’s <code>build.gradle.kts</code>
 file:</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode kotlin"><code class="sourceCode kotlin"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dependencies <span class="op">{</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    implementation<span class="op">(</span><span class="st">&quot;de.link4health:link4health-egk-library:version&quot;</span><span class="op">)</span> <span class="co">// Replace &#39;version&#39; with desired version.</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode kotlin"><code class="sourceCode kotlin"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dependencies <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    implementation<span class="op">(</span><span class="st">&quot;de.link4health:link4health-egk-library:version&quot;</span><span class="op">)</span> <span class="co">// Replace &#39;version&#39; with desired version.</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>To build the library locally and publish to your local Maven
 repository, run these Gradle tasks:</p>
 <ol type="1">
 <li><strong>Build the library:</strong></li>
 </ol>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./gradlew</span> assembleRelease</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./gradlew</span> assembleRelease</span></code></pre></div>
 <ol start="2" type="1">
 <li><strong>Publish to local Maven:</strong></li>
 </ol>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./gradlew</span> publishLink4HealthEgkLibraryPublicationToMavenLocal</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./gradlew</span> publishLink4HealthEgkLibraryPublicationToMavenLocal</span></code></pre></div>
 <h3 id="proguard-or-r8-setup">Proguard or R8 setup</h3>
 <p>The library provides a <code>consumer-rules.pro</code> file that
 contains the rules for this SDK. Your app does not need to set up any
@@ -132,15 +142,15 @@ NVD.</p>
 href="https://link4health.github.io/link4health-egk-library/">link4health-egk-library</a></p>
     <h3>Documentation per Version</h3>
     <div id="documentation-versions">
-        
         <div class="version-section">
-            <h4>Documentation for Version v1.0.1</h4>
-            <ul>
-                <li><a href="releases/v1.0.1/javaDoc/index.html">JavaDoc</a></li>
-                <li><a href="releases/v1.0.1/licenses/index.html">Licenses</a></li>
-                <li><a href="releases/v1.0.1/release-notes.html">Release Notes</a></li>
-            </ul>
-        <div class="version-section">
+    <h4>Documentation for Version v1.0.1</h4>
+    <ul>
+        <li><a href="releases/v1.0.1/javaDoc/index.html">JavaDoc</a></li>
+        <li><a href="releases/v1.0.1/licenses/index.html">Licenses</a></li>
+        <li><a href="releases/v1.0.1/release-notes.html">Release Notes</a></li>
+    </ul>
+</div>
+<div class="version-section">
     <h4>Documentation for Version v1.0.2</h4>
     <ul>
         <li><a href="releases/v1.0.2/javaDoc/index.html">JavaDoc</a></li>
@@ -148,7 +158,6 @@ href="https://link4health.github.io/link4health-egk-library/">link4health-egk-li
         <li><a href="releases/v1.0.2/release-notes.html">Release Notes</a></li>
     </ul>
 </div>
-
     </div>
 </div>
 </body>
