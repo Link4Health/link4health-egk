@@ -189,16 +189,16 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
         env:
-          GITHUB_TOKEN: ${{ secrets.SDK_REPO_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Pull Request for Documentation Updates
         id: create_pr_docs
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.SDK_REPO_PAT }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           sign-commits: true
           commit-message: "Update generated documentation"
-          branch: pages-deployment
-          base: main
+          branch: main
+          base: pages-deployment
           title: "Deploy Documentation and Reports"
           body: "Automated deployment of documentation and reports"
