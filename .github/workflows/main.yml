@@ -216,13 +216,13 @@ jobs:
         with:
           # Upload the docs directory
           path: 'docs'
-          name: 'documentation-artifact'
+          name: 'documentation-artifact-${{ github.run_id }}'
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
         with:
-          artifact_name: 'documentation-artifact'
+          artifact_name: 'documentation-artifact-${{ github.run_id }}'
         env:
           GITHUB_TOKEN: ${{ secrets.SDK_REPO_PAT }}
 
