@@ -2,7 +2,9 @@ import de.ehex.settings.GITHUB_BUILD_NUMBER
 import de.ehex.settings.getGitHash
 import de.ehex.settings.nameSpace
 import org.json.JSONObject
+import java.io.IOException
 import java.net.HttpURLConnection
+import java.net.MalformedURLException
 import java.net.URL
 import java.util.*
 
@@ -262,6 +264,11 @@ publishing {
             artifact("${layout.buildDirectory.get()}/outputs/aar/$artifactFileName") {
                 extension = "aar"
             }
+
+            // Artefakte für JavaDoc und HTML-Dokumentation
+            artifact(tasks.named("dokkaJavadocJar"))
+            artifact(tasks.named("dokkaHtmlJar"))
+
             pom {
                 name.set("Link4Health eGK Library")
                 description.set("A library to use the egk for CardLink.")
@@ -333,7 +340,6 @@ tasks.register("checkAndDeleteFolder") {
         val auth = Base64.getEncoder().encodeToString("$nexusUsername:$nexusPassword".toByteArray())
 
         println("Checking if component $groupPath:$artifactName:$artifactVersion exists in Nexus repository.")
-        println("Query URL: $queryUrlString")
 
         var continuationToken: String? = null
 
@@ -347,28 +353,60 @@ tasks.register("checkAndDeleteFolder") {
                 val connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = "GET"
                 connection.setRequestProperty("Authorization", "Basic $auth")
-                val responseCode = connection.responseCode
 
-                println("Check request response code: $responseCode")
+                when (connection.responseCode) {
+                    HttpURLConnection.HTTP_OK -> {
+                        connection.inputStream.bufferedReader().use { it.readText() }
+                    }
 
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    connection.inputStream.bufferedReader().use { it.readText() }
-                } else if (responseCode == 500) {
-                    // Handle 500 error gracefully and return null
-                    println("Component not found, response code: $responseCode. No action needed.")
-                    null
-                } else {
-                    throw GradleException("Failed to check component in Nexus repository. HTTP response code: $responseCode")
+                    500 -> {
+                        println("Component not found, response code: ${connection.responseCode}. No action needed.")
+                        null
+                    }
+
+                    else -> {
+                        println("Failed to check component in Nexus repository. HTTP response code: ${connection.responseCode}")
+                        null
+                    }
                 }
-            } catch (e: Exception) {
-                println("Error during component check: ${e.message}")
+            } catch (e: MalformedURLException) {
+                println("The URL is malformed: ${e.message}")
                 null
+            } catch (e: IOException) {
+                println("An I/O error occurred: ${e.message}")
+                null
+            }
+        }
+
+        fun deleteComponent(repositoryUrl: String, id: String, auth: String) {
+            val deleteUrlString = "$repositoryUrl/$id"
+            val deleteUrl = URL(deleteUrlString)
+
+            val deleteConnection = deleteUrl.openConnection() as HttpURLConnection
+            deleteConnection.requestMethod = "DELETE"
+            deleteConnection.setRequestProperty("Authorization", "Basic $auth")
+            val deleteResponseCode = deleteConnection.responseCode
+
+            println("Delete request response code: $deleteResponseCode")
+
+            when (deleteResponseCode) {
+                HttpURLConnection.HTTP_NO_CONTENT, HttpURLConnection.HTTP_OK -> {
+                    println("Component $groupPath:$artifactName:$artifactVersion deleted successfully from Nexus repository.")
+                }
+
+                HttpURLConnection.HTTP_UNAUTHORIZED -> {
+                    println("Failed to delete component $groupPath:$artifactName:$artifactVersion from Nexus repository. Unauthorized: HTTP response code: $deleteResponseCode")
+                }
+
+                else -> {
+                    println("Failed to delete component $groupPath:$artifactName:$artifactVersion from Nexus repository. HTTP response code: $deleteResponseCode")
+                }
             }
         }
 
         var componentDeleted = false
 
-        while (true) {
+        while (!componentDeleted) {
             val response = getComponents(continuationToken) ?: break
 
             // Parse JSON response
@@ -385,42 +423,13 @@ tasks.register("checkAndDeleteFolder") {
 
                 if (group == groupPath && name == artifactName && version == artifactVersion) {
                     println("Component $groupPath:$artifactName:$artifactVersion exists. Proceeding with deletion of component ID: $id")
-
-                    val deleteUrlString = "$repositoryUrl/$id"
-                    val deleteUrl = URL(deleteUrlString)
-
-                    val deleteConnection = deleteUrl.openConnection() as HttpURLConnection
-                    deleteConnection.requestMethod = "DELETE"
-                    deleteConnection.setRequestProperty("Authorization", "Basic $auth")
-                    val deleteResponseCode = deleteConnection.responseCode
-
-                    println("Delete request response code: $deleteResponseCode")
-
-                    when (deleteResponseCode) {
-                        HttpURLConnection.HTTP_NO_CONTENT, HttpURLConnection.HTTP_OK -> {
-                            println("Component $groupPath:$artifactName:$artifactVersion deleted successfully from Nexus repository.")
-                            componentDeleted = true
-                        }
-
-                        HttpURLConnection.HTTP_UNAUTHORIZED -> {
-                            throw GradleException(
-                                "Failed to delete component $groupPath:$artifactName:$artifactVersion from Nexus repository." +
-                                    "Unauthorized: HTTP response code: $deleteResponseCode",
-                            )
-                        }
-
-                        else -> {
-                            throw GradleException(
-                                "Failed to delete component $groupPath:$artifactName:$artifactVersion from Nexus repository." +
-                                    "HTTP response code: $deleteResponseCode",
-                            )
-                        }
-                    }
+                    deleteComponent(repositoryUrl, id, auth)
+                    componentDeleted = true
                     break
                 }
             }
 
-            if (componentDeleted || continuationToken == null) {
+            if (continuationToken == null) {
                 break
             }
         }
