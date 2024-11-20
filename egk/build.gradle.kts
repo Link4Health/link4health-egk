@@ -262,6 +262,11 @@ publishing {
             artifact("${layout.buildDirectory.get()}/outputs/aar/$artifactFileName") {
                 extension = "aar"
             }
+
+            // Artefakte für JavaDoc und HTML-Dokumentation
+            artifact(tasks.named("dokkaJavadocJar"))
+            artifact(tasks.named("dokkaHtmlJar"))
+
             pom {
                 name.set("Link4Health eGK Library")
                 description.set("A library to use the egk for CardLink.")
