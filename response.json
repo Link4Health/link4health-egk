@@ -1,9 +1,9 @@
 {
-  "url": "https://api.github.com/repos/Link4Health/link4health-egk-library/releases/186270714",
-  "assets_url": "https://api.github.com/repos/Link4Health/link4health-egk-library/releases/186270714/assets",
-  "upload_url": "https://uploads.github.com/repos/Link4Health/link4health-egk-library/releases/186270714/assets{?name,label}",
-  "html_url": "https://github.com/Link4Health/link4health-egk-library/releases/tag/v1.0.2",
-  "id": 186270714,
+  "url": "https://api.github.com/repos/Link4Health/link4health-egk/releases/186275801",
+  "assets_url": "https://api.github.com/repos/Link4Health/link4health-egk/releases/186275801/assets",
+  "upload_url": "https://uploads.github.com/repos/Link4Health/link4health-egk/releases/186275801/assets{?name,label}",
+  "html_url": "https://github.com/Link4Health/link4health-egk/releases/tag/v1.0.2",
+  "id": 186275801,
   "author": {
     "login": "NDuering",
     "id": 154430948,
@@ -25,20 +25,20 @@
     "user_view_type": "public",
     "site_admin": false
   },
-  "node_id": "RE_kwDOMgW0Ps4LGkP6",
+  "node_id": "RE_kwDOMgW0Ps4LGlfZ",
   "tag_name": "v1.0.2",
   "target_commitish": "develop",
   "name": "v1.0.2",
   "draft": false,
   "prerelease": false,
-  "created_at": "2024-11-19T19:30:29Z",
-  "published_at": "2024-11-19T19:30:31Z",
+  "created_at": "2024-11-19T20:01:50Z",
+  "published_at": "2024-11-19T20:01:52Z",
   "assets": [
     {
-      "url": "https://api.github.com/repos/Link4Health/link4health-egk-library/releases/assets/207646292",
-      "id": 207646292,
-      "node_id": "RA_kwDOMgW0Ps4MYG5U",
-      "name": "link4health-egk-library-1.0.2-41-ce95ae1.aar",
+      "url": "https://api.github.com/repos/Link4Health/link4health-egk/releases/assets/207650957",
+      "id": 207650957,
+      "node_id": "RA_kwDOMgW0Ps4MYICN",
+      "name": "link4health-egk-library-1.0.2-42-b8484ed.aar",
       "label": "",
       "uploader": {
         "login": "NDuering",
@@ -65,12 +65,12 @@
       "state": "uploaded",
       "size": 129425,
       "download_count": 0,
-      "created_at": "2024-11-19T19:30:32Z",
-      "updated_at": "2024-11-19T19:30:32Z",
-      "browser_download_url": "https://github.com/Link4Health/link4health-egk-library/releases/download/v1.0.2/link4health-egk-library-1.0.2-41-ce95ae1.aar"
+      "created_at": "2024-11-19T20:01:52Z",
+      "updated_at": "2024-11-19T20:01:53Z",
+      "browser_download_url": "https://github.com/Link4Health/link4health-egk/releases/download/v1.0.2/link4health-egk-library-1.0.2-42-b8484ed.aar"
     }
   ],
-  "tarball_url": "https://api.github.com/repos/Link4Health/link4health-egk-library/tarball/v1.0.2",
-  "zipball_url": "https://api.github.com/repos/Link4Health/link4health-egk-library/zipball/v1.0.2",
+  "tarball_url": "https://api.github.com/repos/Link4Health/link4health-egk/tarball/v1.0.2",
+  "zipball_url": "https://api.github.com/repos/Link4Health/link4health-egk/zipball/v1.0.2",
   "body": "### New Features\n\n- update Kotlin to 2.0.21\n- change dependencies resolutions to Link4Health Nexus\n\n---\n\n### Bugfixes\n\n\n---"
 }
