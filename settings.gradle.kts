@@ -60,5 +60,5 @@ dependencyResolutionManagement {
         }
     }
 }
-rootProject.name = "link4health-egk-library"
+rootProject.name = "link4health-egk"
 include(":egk")
