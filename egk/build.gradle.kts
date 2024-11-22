@@ -263,6 +263,7 @@ publishing {
 
             artifact("${layout.buildDirectory.get()}/outputs/aar/$artifactFileName") {
                 extension = "aar"
+                classifier = gitHash
             }
 
             // Artefakte für JavaDoc und HTML-Dokumentation
