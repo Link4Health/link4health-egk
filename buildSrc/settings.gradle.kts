@@ -40,6 +40,7 @@ dependencyResolutionManagement {
         val anonymousAccess = anonymous?.toBoolean() ?: true
         if (anonymousAccess) {
             println("using anonymous access")
+            mavenLocal()
             maven {
                 name = "Link4Health Nexus"
                 url = uri("$contextUrl/link4health-anonymous/")
@@ -49,6 +50,7 @@ dependencyResolutionManagement {
             }
         } else {
             println("using login access")
+            mavenLocal()
             maven {
                 name = "Link4Health Nexus"
                 url = uri("$contextUrl/link4health-development/")
