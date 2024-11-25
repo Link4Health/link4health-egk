@@ -1,9 +1,9 @@
 {
-  "url": "https://api.github.com/repos/Link4Health/link4health-egk/releases/186973171",
-  "assets_url": "https://api.github.com/repos/Link4Health/link4health-egk/releases/186973171/assets",
-  "upload_url": "https://uploads.github.com/repos/Link4Health/link4health-egk/releases/186973171/assets{?name,label}",
+  "url": "https://api.github.com/repos/Link4Health/link4health-egk/releases/187245302",
+  "assets_url": "https://api.github.com/repos/Link4Health/link4health-egk/releases/187245302/assets",
+  "upload_url": "https://uploads.github.com/repos/Link4Health/link4health-egk/releases/187245302/assets{?name,label}",
   "html_url": "https://github.com/Link4Health/link4health-egk/releases/tag/v1.0.2",
-  "id": 186973171,
+  "id": 187245302,
   "author": {
     "login": "NDuering",
     "id": 154430948,
@@ -25,20 +25,20 @@
     "user_view_type": "public",
     "site_admin": false
   },
-  "node_id": "RE_kwDOMgW0Ps4LJPvz",
+  "node_id": "RE_kwDOMgW0Ps4LKSL2",
   "tag_name": "v1.0.2",
   "target_commitish": "develop",
   "name": "v1.0.2",
   "draft": false,
   "prerelease": false,
-  "created_at": "2024-11-22T16:20:52Z",
-  "published_at": "2024-11-22T16:20:54Z",
+  "created_at": "2024-11-25T09:35:13Z",
+  "published_at": "2024-11-25T09:35:15Z",
   "assets": [
     {
-      "url": "https://api.github.com/repos/Link4Health/link4health-egk/releases/assets/208373436",
-      "id": 208373436,
-      "node_id": "RA_kwDOMgW0Ps4Ma4a8",
-      "name": "link4health-egk-1.0.2-45-8e68768.aar",
+      "url": "https://api.github.com/repos/Link4Health/link4health-egk/releases/assets/208900077",
+      "id": 208900077,
+      "node_id": "RA_kwDOMgW0Ps4Mc4_t",
+      "name": "link4health-egk-1.0.2-46-5bed3f5.aar",
       "label": "",
       "uploader": {
         "login": "NDuering",
@@ -65,9 +65,9 @@
       "state": "uploaded",
       "size": 129425,
       "download_count": 0,
-      "created_at": "2024-11-22T16:20:55Z",
-      "updated_at": "2024-11-22T16:20:55Z",
-      "browser_download_url": "https://github.com/Link4Health/link4health-egk/releases/download/v1.0.2/link4health-egk-1.0.2-45-8e68768.aar"
+      "created_at": "2024-11-25T09:35:16Z",
+      "updated_at": "2024-11-25T09:35:16Z",
+      "browser_download_url": "https://github.com/Link4Health/link4health-egk/releases/download/v1.0.2/link4health-egk-1.0.2-46-5bed3f5.aar"
     }
   ],
   "tarball_url": "https://api.github.com/repos/Link4Health/link4health-egk/tarball/v1.0.2",
