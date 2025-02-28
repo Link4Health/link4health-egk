@@ -1,6 +1,7 @@
 package de.link4health.egk.egk
 
 import de.link4health.egk.card.CardKey
+import de.link4health.egk.cardobjects.Df
 import de.link4health.egk.cardobjects.Ef
 import de.link4health.egk.command.HealthCardCommand
 import de.link4health.egk.command.read
@@ -124,9 +125,24 @@ object EGKCommands {
      * @param expectedLength the expected length of the response data
      * @return a [HealthCardCommand] object representing the command
      */
-    fun commandReadX509AuthECC(expectedLength: Int): HealthCardCommand {
+    fun commandReadPd(expectedLength: Int): HealthCardCommand {
         return HealthCardCommand.read(
-            ShortFileIdentifier(Ef.ESignCChAutE256.SFID),
+            ShortFileIdentifier(Df.HCA.Ef.PD.SFID),
+            ne = expectedLength,
+            offset = 0,
+        )
+    }
+
+    /**
+     * Reads the ESignCChAutE256 file from the health card.
+     * Needs select command before reading this.
+     *
+     * @param expectedLength the expected length of the response data
+     * @return a [HealthCardCommand] object representing the command
+     */
+    fun commandReadVd(expectedLength: Int): HealthCardCommand {
+        return HealthCardCommand.read(
+            ShortFileIdentifier(Df.HCA.Ef.VD.SFID),
             ne = expectedLength,
             offset = 0,
         )

@@ -268,6 +268,22 @@ object Df {
     object Esign {
         const val AID = "A000000167455349474E"
     }
+
+    object HCA {
+        const val AID = "D27600000102"
+
+        object Ef {
+            object PD {
+                const val FID = 0xD001
+                const val SFID = 0x01
+            }
+
+            object VD {
+                const val FID = 0xD002
+                const val SFID = 0x02
+            }
+        }
+    }
 }
 
 /**
