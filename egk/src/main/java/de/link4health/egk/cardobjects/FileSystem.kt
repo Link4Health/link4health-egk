@@ -207,6 +207,7 @@ object Ef {
     /**
      * Represents a class for ESignCChAutR2048. It contains two constant properties.
      *
+     *
      * @property FID The file identifier of ESignCChAutR2048.
      * @property SFID The short file identifier of ESignCChAutR2048.
      */
@@ -271,18 +272,6 @@ object Df {
 
     object HCA {
         const val AID = "D27600000102"
-
-        object Ef {
-            object PD {
-                const val FID = 0xD001
-                const val SFID = 0x01
-            }
-
-            object VD {
-                const val FID = 0xD002
-                const val SFID = 0x02
-            }
-        }
     }
 }
 

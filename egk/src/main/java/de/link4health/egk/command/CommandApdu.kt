@@ -141,7 +141,7 @@ class CommandApdu(
 
             return if (data != null) {
                 val nc = data.size
-                require(nc <= MAX_APDU_DATA_LENGTH) { "ADPU cmd data length must not exceed $MAX_APDU_DATA_LENGTH bytes" }
+                require(nc <= MAX_APDU_DATA_LENGTH) { "APDU cmd data length must not exceed $MAX_APDU_DATA_LENGTH bytes" }
 
                 val dataOffset: Int
                 val le: Int? // le1, le2
