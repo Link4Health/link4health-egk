@@ -116,32 +116,4 @@ object EGKCommands {
             offset = 0,
         )
     }
-
-    /**
-     * Reads PD file from the health card.
-     * Needs select command before reading this.
-     * @param expectedLength the expected length of the response data
-     * @return a [HealthCardCommand] object representing the command
-     */
-    fun commandReadPd(expectedLength: Int): HealthCardCommand {
-        return HealthCardCommand.read(
-            ShortFileIdentifier(Ef.HcaPD.SFID),
-            ne = expectedLength,
-            offset = 0,
-        )
-    }
-
-    /**
-     * Reads VD file from the health card.
-     * Needs select command before reading this.
-     * @param expectedLength the expected length of the response data
-     * @return a [HealthCardCommand] object representing the command
-     */
-    fun commandReadVd(expectedLength: Int): HealthCardCommand {
-        return HealthCardCommand.read(
-            ShortFileIdentifier(Ef.HcaVD.SFID),
-            ne = expectedLength,
-            offset = 0,
-        )
-    }
 }
