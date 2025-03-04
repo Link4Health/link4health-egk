@@ -143,15 +143,6 @@ object Ef {
     }
 
     /**
-     * This class represents the HcaPD protocol data.
-     * It provides constants related to FID and SFID.
-     */
-    object HcaPD {
-        const val FID = 0xD001
-        const val SFID = 0x01
-    }
-
-    /**
      * Represents a class for managing HCA Pruefungsnachweis.
      */
     object HcaPruefungsnachweis {
@@ -187,14 +178,6 @@ object Ef {
     }
 
     /**
-     * HcaVD is a singleton object that provides constants related to HCA VD.
-     */
-    object HcaVD {
-        const val FID = 0xD002
-        const val SFID = 0x02
-    }
-
-    /**
      * This object represents the HCA Verweis class.
      *
      * The HCA Verweis class provides constants related to the verweis field code.
@@ -206,6 +189,7 @@ object Ef {
 
     /**
      * Represents a class for ESignCChAutR2048. It contains two constant properties.
+     *
      *
      * @property FID The file identifier of ESignCChAutR2048.
      * @property SFID The short file identifier of ESignCChAutR2048.
@@ -267,6 +251,10 @@ object Ef {
 object Df {
     object Esign {
         const val AID = "A000000167455349474E"
+    }
+
+    object HCA {
+        const val AID = "D27600000102"
     }
 }
 
@@ -341,6 +329,29 @@ object Mf {
                     const val KID = 0x04
                 }
             }
+
+        }
+
+        object HCA {
+            object Ef {
+                /**
+                 * This class represents the HcaPD protocol data.
+                 * It provides constants related to FID and SFID.
+                 */
+                object PD {
+                    const val FID = 0xD001
+                    const val SFID = 0x01
+                }
+
+                /**
+                 * HcaVD is a singleton object that provides constants related to HCA VD.
+                 */
+                object VD {
+                    const val FID = 0xD002
+                    const val SFID = 0x02
+                }
+            }
+
         }
     }
 }
