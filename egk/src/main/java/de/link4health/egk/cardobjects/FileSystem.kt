@@ -329,7 +329,6 @@ object Mf {
                     const val KID = 0x04
                 }
             }
-
         }
 
         object HCA {
@@ -351,7 +350,6 @@ object Mf {
                     const val SFID = 0x02
                 }
             }
-
         }
     }
 }
