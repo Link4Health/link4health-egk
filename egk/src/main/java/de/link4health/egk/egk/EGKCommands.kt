@@ -116,4 +116,19 @@ object EGKCommands {
             offset = 0,
         )
     }
+
+    /**
+     * Reads the ESignCChAutE256 file from the health card.
+     * Needs select command before reading this.
+     *
+     * @param expectedLength the expected length of the response data
+     * @return a [HealthCardCommand] object representing the command
+     */
+    fun commandReadX509AuthECC(expectedLength: Int): HealthCardCommand {
+        return HealthCardCommand.read(
+            ShortFileIdentifier(Ef.ESignCChAutE256.SFID),
+            ne = expectedLength,
+            offset = 0,
+        )
+    }
 }
