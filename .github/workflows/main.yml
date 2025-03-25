@@ -28,7 +28,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Egk library
         uses: actions/checkout@v4
@@ -130,7 +130,7 @@ jobs:
         with:
           tag: ${{ env.TAG_NAME }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
 
       - name: Create or Update Git Tag
         id: create_tag
@@ -141,7 +141,7 @@ jobs:
       - name: Push Tag to Repository
         id: push_tag
         env:
-          GH_TOKEN: ${{ secrets.SDK_REPO_PAT }}
+          GH_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
         run: |
           TAG_NAME="${{ env.TAG_NAME }}"
           git push origin "$TAG_NAME" --force
@@ -161,16 +161,18 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
+          prerelease: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
             egk/build/outputs/aar/*.aar
           body: ${{ env.RELEASE_NOTES }}
         env:
-          GITHUB_TOKEN: ${{ secrets.SDK_REPO_PAT }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
 
-      # Schritte für die Veröffentlichung auf GitHub Pages
       - name: Install Pandoc
-        run: brew install pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install pandoc
 
       - name: Generate Documentation Index HTML
         run: |
@@ -192,13 +194,13 @@ jobs:
         with:
           artifact_name: 'documentation-artifact-${{ github.run_id }}'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
 
       - name: Create Pull Request for Documentation Updates
         id: create_pr_docs
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.SDK_REPO_PAT }}
+          token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
           sign-commits: true
           commit-message: "Update generated documentation"
           branch: update-gh-pages
@@ -211,4 +213,4 @@ jobs:
         run: |
           gh pr merge ${{ steps.create_pr_docs.outputs.pull-request-url }} --merge --admin
         env:
-          GITHUB_TOKEN: ${{ secrets.SDK_REPO_PAT }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
