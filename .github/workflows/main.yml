@@ -1,4 +1,4 @@
-name: Build and publish Egk Release
+name: Build EGK Release
 on:
   push:
     branches:
@@ -18,25 +18,17 @@ permissions:
   id-token: write
   pull-requests: write  # Permissions to create and manage pull requests
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
 jobs:
   release:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout Egk library
+      - name: Checkout EGK library
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}  # Dynamisch den Branch setzen
           fetch-depth: 0
 
-      - name: Egk grant execute permission for gradlew
+      - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Set up JDK 17
@@ -52,7 +44,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Set up Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v3
+        uses: gradle/actions/wrapper-validation@v4
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
@@ -98,117 +90,6 @@ jobs:
           echo "anonymous=false" >> ~/.gradle/gradle.properties
           echo "org.gradle.internal.publish.checksums.insecure=true" >> ~/.gradle/gradle.properties
 
-      - name: Build Egk Release
+      - name: Build EGK Release
         run: |
           ./gradlew clean :egk:assembleRelease
-
-      - name: Publish Egk Release
-        run: |
-          ./gradlew :egk:publishLink4HealthEgkLibraryPublicationToLink4HealthNexusRepository
-
-      - name: Set Tag Name
-        id: set_tag_name
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "TAG_NAME=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
-          else
-            TAG_NAME="v${{ env.MAJOR_EGK_VERSION }}.${{ env.MINOR_EGK_VERSION }}.${{ env.PATCH_EGK_VERSION }}"
-            echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
-          fi
-
-      - name: Check if Release exists
-        id: check_release
-        run: |
-          RELEASE_URL="https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.TAG_NAME }}"
-          response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" $RELEASE_URL)
-          echo "$response" > response.json
-          echo "RELEASE_RESPONSE=$(<response.json jq -c)" >> $GITHUB_ENV
-
-      - name: Delete existing release
-        uses: cb80/delrel@latest
-        if: env.RELEASE_RESPONSE != 'null'
-        with:
-          tag: ${{ env.TAG_NAME }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create or Update Git Tag
-        id: create_tag
-        run: |
-          TAG_NAME="${{ env.TAG_NAME }}"
-          git tag -fa "$TAG_NAME" -m "Release $TAG_NAME"
-
-      - name: Push Tag to Repository
-        id: push_tag
-        env:
-          GH_TOKEN: ${{ secrets.SDK_REPO_PAT }}
-        run: |
-          TAG_NAME="${{ env.TAG_NAME }}"
-          git push origin "$TAG_NAME" --force
-
-      - name: Read release notes
-        id: get_release_notes
-        run: |
-          if [[ ! -f RELEASENOTES.md ]]; then
-            echo "::error::RELEASENOTES.md file not found"
-            exit 1
-          fi
-          release_notes=$(cat RELEASENOTES.md)
-          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
-          echo "$release_notes" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.TAG_NAME }}
-          files: |
-            egk/build/outputs/aar/*.aar
-          body: ${{ env.RELEASE_NOTES }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.SDK_REPO_PAT }}
-
-      # Schritte für die Veröffentlichung auf GitHub Pages
-      - name: Install Pandoc
-        run: brew install pandoc
-
-      - name: Generate Documentation Index HTML
-        run: |
-          ./gradlew generateDocIndexHtml
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload the docs directory
-          path: 'docs'
-          name: 'documentation-artifact-${{ github.run_id }}'
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-        with:
-          artifact_name: 'documentation-artifact-${{ github.run_id }}'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Pull Request for Documentation Updates
-        id: create_pr_docs
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.SDK_REPO_PAT }}
-          sign-commits: true
-          commit-message: "Update generated documentation"
-          branch: update-gh-pages
-          base: gh-pages
-          title: "Deploy Documentation and Reports"
-          body: "Automated deployment of documentation and reports"
-
-      - name: Merge Pull Request
-        if: steps.create_pr_docs.outputs.pull-request-url != ''
-        run: |
-          gh pr merge ${{ steps.create_pr_docs.outputs.pull-request-url }} --merge --admin
-        env:
-          GITHUB_TOKEN: ${{ secrets.SDK_REPO_PAT }}
