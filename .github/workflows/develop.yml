@@ -1,4 +1,4 @@
-name: Build and publish Egk SNAPSHOT
+name: Build and publish EGK SNAPSHOT
 
 on:
   push:
@@ -16,10 +16,10 @@ permissions:
 jobs:
   develop:
 
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Egk
+      - name: Checkout EGK
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}  # Dynamisch den Branch setzen
@@ -41,7 +41,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Set up Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v3
+        uses: gradle/actions/wrapper-validation@v4
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
@@ -85,10 +85,10 @@ jobs:
           echo "anonymous=false" >> ~/.gradle/gradle.properties
           echo "org.gradle.internal.publish.checksums.insecure=true" >> ~/.gradle/gradle.properties
 
-      - name: Build Egk SNAPSHOT
+      - name: Build EGK SNAPSHOT
         run: |
           ./gradlew clean :egk:assembleDebug
 
-      - name: Publish Egk SNAPSHOT
+      - name: Publish EGK SNAPSHOT
         run: |
           ./gradlew :egk:publishLink4HealthEgkLibraryPublicationToLink4HealthNexusRepository
