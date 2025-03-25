@@ -1,3 +1,3 @@
 ### New Features
 
-- add new HCA directory accessors
+- bump AGP to 8.6.1
