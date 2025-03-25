@@ -1,3 +1,3 @@
-### New Features
+### Bug Fixes
 
-- bump AGP to 8.6.1
+- revert removal of a few methods present in the 1.0.3 release

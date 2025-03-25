@@ -5,6 +5,11 @@ on:
       tag:
         description: 'Tag to create or update'
         required: true
+      publish_on_nexus:
+        description: 'Flag to trigger Nexus publication'
+        required: true
+        type: boolean
+        default: false
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -98,6 +103,7 @@ jobs:
           ./gradlew clean :egk:assembleRelease
 
       - name: Publish Egk Release
+        if: ${{ github.event.inputs.publish_on_nexus }}
         run: |
           ./gradlew :egk:publishLink4HealthEgkLibraryPublicationToLink4HealthNexusRepository
 

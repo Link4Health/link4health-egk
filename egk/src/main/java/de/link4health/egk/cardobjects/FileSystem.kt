@@ -143,6 +143,15 @@ object Ef {
     }
 
     /**
+     * This class represents the HcaPD protocol data.
+     * It provides constants related to FID and SFID.
+     */
+    object HcaPD {
+        const val FID = 0xD001
+        const val SFID = 0x01
+    }
+
+    /**
      * Represents a class for managing HCA Pruefungsnachweis.
      */
     object HcaPruefungsnachweis {
@@ -175,6 +184,14 @@ object Ef {
     object HcaTTN {
         const val FID = 0xD00F
         const val SFID = 0x0F
+    }
+
+    /**
+     * HcaVD is a singleton object that provides constants related to HCA VD.
+     */
+    object HcaVD {
+        const val FID = 0xD002
+        const val SFID = 0x02
     }
 
     /**
