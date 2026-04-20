@@ -1,12 +1,6 @@
 import de.ehex.settings.GITHUB_BUILD_NUMBER
 import de.ehex.settings.getGitHash
 import de.ehex.settings.nameSpace
-import org.json.JSONObject
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.MalformedURLException
-import java.net.URL
-import java.util.*
 
 plugins {
     alias(libs.plugins.androidLibrary)
@@ -143,7 +137,7 @@ licenseReport {
 
     // Set output directory for the report data.
     // Defaults to ${project.buildDir}/reports/dependency-license.
-//    outputDir = "${rootProject.projectDir}/docs/licenses"
+    // outputDir = "${rootProject.projectDir}/docs/licenses"
 
     // Select projects to examine for dependencies.
     // Defaults to current project and all its subprojects
@@ -322,124 +316,4 @@ fun isSnapshot(): Boolean {
         return files?.isNotEmpty() ?: false
     }
     return false
-}
-
-val apiContextUrl: String? by extra
-val nexusUsername: String? by extra
-val nexusPassword: String? by extra
-tasks.register("checkAndDeleteFolder") {
-    group = "publishing"
-    description = "Checks if the folder containing the artifact exists in the Nexus repository and deletes it if found."
-
-    doLast {
-        val repositoryUrl = "$apiContextUrl/service/rest/v1/components"
-        val groupPath = "de.link4health.egk.api"
-        val artifactName = "${rootProject.name}-library"
-        val artifactVersion = libraryVersionEgk
-        val queryUrlString = "$repositoryUrl?repository=link4health-releases"
-        val auth = Base64.getEncoder().encodeToString("$nexusUsername:$nexusPassword".toByteArray())
-
-        println("Checking if component $groupPath:$artifactName:$artifactVersion exists in Nexus repository.")
-
-        var continuationToken: String? = null
-
-        fun getComponents(token: String?): String? {
-            return try {
-                val url = if (token == null) {
-                    URL(queryUrlString)
-                } else {
-                    URL("$queryUrlString&continuationToken=$token")
-                }
-                val connection = url.openConnection() as HttpURLConnection
-                connection.requestMethod = "GET"
-                connection.setRequestProperty("Authorization", "Basic $auth")
-
-                when (connection.responseCode) {
-                    HttpURLConnection.HTTP_OK -> {
-                        connection.inputStream.bufferedReader().use { it.readText() }
-                    }
-
-                    500 -> {
-                        println("Component not found, response code: ${connection.responseCode}. No action needed.")
-                        null
-                    }
-
-                    else -> {
-                        println("Failed to check component in Nexus repository. HTTP response code: ${connection.responseCode}")
-                        null
-                    }
-                }
-            } catch (e: MalformedURLException) {
-                println("The URL is malformed: ${e.message}")
-                null
-            } catch (e: IOException) {
-                println("An I/O error occurred: ${e.message}")
-                null
-            }
-        }
-
-        fun deleteComponent(repositoryUrl: String, id: String, auth: String) {
-            val deleteUrlString = "$repositoryUrl/$id"
-            val deleteUrl = URL(deleteUrlString)
-
-            val deleteConnection = deleteUrl.openConnection() as HttpURLConnection
-            deleteConnection.requestMethod = "DELETE"
-            deleteConnection.setRequestProperty("Authorization", "Basic $auth")
-            val deleteResponseCode = deleteConnection.responseCode
-
-            println("Delete request response code: $deleteResponseCode")
-
-            when (deleteResponseCode) {
-                HttpURLConnection.HTTP_NO_CONTENT, HttpURLConnection.HTTP_OK -> {
-                    println("Component $groupPath:$artifactName:$artifactVersion deleted successfully from Nexus repository.")
-                }
-
-                HttpURLConnection.HTTP_UNAUTHORIZED -> {
-                    println("Failed to delete component $groupPath:$artifactName:$artifactVersion from Nexus repository. Unauthorized: HTTP response code: $deleteResponseCode")
-                }
-
-                else -> {
-                    println("Failed to delete component $groupPath:$artifactName:$artifactVersion from Nexus repository. HTTP response code: $deleteResponseCode")
-                }
-            }
-        }
-
-        var componentDeleted = false
-
-        while (!componentDeleted) {
-            val response = getComponents(continuationToken) ?: break
-
-            // Parse JSON response
-            val jsonResponse = JSONObject(response)
-            val items = jsonResponse.getJSONArray("items")
-            continuationToken = jsonResponse.optString("continuationToken", null)
-
-            for (i in 0 until items.length()) {
-                val item = items.getJSONObject(i)
-                val group = item.getString("group")
-                val name = item.getString("name")
-                val version = item.getString("version")
-                val id = item.getString("id")
-
-                if (group == groupPath && name == artifactName && version == artifactVersion) {
-                    println("Component $groupPath:$artifactName:$artifactVersion exists. Proceeding with deletion of component ID: $id")
-                    deleteComponent(repositoryUrl, id, auth)
-                    componentDeleted = true
-                    break
-                }
-            }
-
-            if (continuationToken == null) {
-                break
-            }
-        }
-
-        if (!componentDeleted) {
-            println("Component $groupPath:$artifactName:$artifactVersion does not exist in Nexus repository. Nothing to delete.")
-        }
-    }
-}
-
-tasks.named("publishLink4HealthEgkLibraryPublicationToLink4HealthNexusRepository") {
-    dependsOn(tasks.named("checkAndDeleteFolder"))
 }

@@ -1,3 +1,3 @@
-### Bug Fixes
+### Changes
 
-- revert removal of a few methods present in the 1.0.3 release
+- remove `checkAndDeleteFolder` publishing task that was deleting Nexus artifacts on publish
