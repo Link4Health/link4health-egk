@@ -2,11 +2,13 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
         val contextUrl = "https://nexus.link4.health/repository"
-        val nexusUsername: String? by extra
-        val nexusPassword: String? by extra
-        val anonymous: String? by extra
-        val anonymousAccess = anonymous?.toBoolean() ?: true
+        val anonymousAccess = providers.gradleProperty("anonymous").orNull?.toBoolean() ?: true
+        val nexusUsername = providers.gradleProperty("nexusUsername").orNull
+        val nexusPassword = providers.gradleProperty("nexusPassword").orNull
         if (anonymousAccess) {
             println("using anonymous access")
             maven {
@@ -33,11 +35,12 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        google()
+        mavenCentral()
         val contextUrl = "https://nexus.link4.health/repository"
-        val nexusUsername: String? by extra
-        val nexusPassword: String? by extra
-        val anonymous: String? by extra
-        val anonymousAccess = anonymous?.toBoolean() ?: true
+        val anonymousAccess = providers.gradleProperty("anonymous").orNull?.toBoolean() ?: true
+        val nexusUsername = providers.gradleProperty("nexusUsername").orNull
+        val nexusPassword = providers.gradleProperty("nexusPassword").orNull
         if (anonymousAccess) {
             println("using anonymous access")
             mavenLocal()

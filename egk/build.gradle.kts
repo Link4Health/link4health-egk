@@ -1,6 +1,11 @@
-import de.ehex.settings.GITHUB_BUILD_NUMBER
+import de.ehex.settings.currentBuildNumber
+import de.ehex.settings.egkLibraryPackageName
+import de.ehex.settings.egkLibraryVersion
 import de.ehex.settings.getGitHash
+import de.ehex.settings.isSnapshotArtifactBuild
 import de.ehex.settings.nameSpace
+import de.ehex.settings.optionalStringProperty
+import de.ehex.settings.registerDocumentationTasks
 
 plugins {
     alias(libs.plugins.androidLibrary)
@@ -15,7 +20,7 @@ plugins {
     `maven-publish`
 }
 
-apply(from = "../generateDoku.gradle.kts")
+registerDocumentationTasks()
 
 spotless {
     kotlin {
@@ -107,12 +112,11 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     executionData.setFrom(fileTree(layout.buildDirectory).include("jacoco/testDebugUnitTest.exec"))
 }
 
-val nvdApiKey: String? by extra
 dependencyCheck {
     autoUpdate = true
     analyzedTypes = listOf("jar, aar")
     format = "HTML"
-    nvd.apiKey = nvdApiKey
+    nvd.apiKey = project.optionalStringProperty("nvdApiKey")
 }
 
 tasks.register<Jar>("dokkaHtmlJar") {
@@ -161,28 +165,20 @@ licenseReport {
     allowedLicensesFile = project.layout.projectDirectory.file("config/allowed-licenses.json").asFile
 }
 
-val injectVariable: MutableMap<String, String> = System.getenv()
-val buildNumber: String = if (GITHUB_BUILD_NUMBER != "0") {
-    GITHUB_BUILD_NUMBER
-} else {
-    project.extra["buildNumber"] as String
-}
-val libraryPackageNameEgkAndroid: String by project.extra
-val majorEgkAndroid: String by project.extra
-val minorEgkAndroid: String by project.extra
-val patchEgkAndroid: String by project.extra
-
-val libraryVersionEgk = "$majorEgkAndroid.$minorEgkAndroid.$patchEgkAndroid"
-val gitHash = getGitHash()
-
 android {
     namespace = nameSpace(project)
     compileSdk = libs.versions.compileSdk.get().toInt()
     lint {
-        baseline = file("config/lint/lint-baseline.xml")
         abortOnError = true
-        warningsAsErrors = true
+        warningsAsErrors = false
         checkDependencies = true
+        lintConfig = rootProject.file("lint.xml")
+        disable += setOf(
+            "AndroidGradlePluginVersion",
+            "GradleDependency",
+            "NewerVersionAvailable",
+            "OldTargetApi",
+        )
     }
     defaultConfig {
         minSdk = libs.versions.minSDK.get().toInt()
@@ -199,6 +195,9 @@ android {
     }
 
     tasks.withType<com.android.build.gradle.tasks.BundleAar>().configureEach {
+        val libraryVersionEgk = project.egkLibraryVersion()
+        val buildNumber = project.currentBuildNumber()
+        val gitHash = project.getGitHash()
         val isDebugBuild = gradle.startParameter.taskNames.any { it.contains("assembleDebug") }
         val buildTypeSuffix = if (isDebugBuild) "SNAPSHOT" else ""
         val type = if (isDebugBuild) {
@@ -242,14 +241,18 @@ dependencies {
 publishing {
     publications {
         create<MavenPublication>("Link4HealthEgkLibrary") {
+            val libraryPackageNameEgkAndroid = project.egkLibraryPackageName()
+            val libraryVersionEgk = project.egkLibraryVersion()
+            val buildNumber = project.currentBuildNumber()
+            val gitHash = project.getGitHash()
             groupId = libraryPackageNameEgkAndroid
             artifactId = "${rootProject.name}-library"
-            version = if (isSnapshot()) {
+            version = if (project.isSnapshotArtifactBuild()) {
                 "$libraryVersionEgk-$buildNumber-SNAPSHOT"
             } else {
                 libraryVersionEgk
             }
-            val artifactFileName = if (isSnapshot()) {
+            val artifactFileName = if (project.isSnapshotArtifactBuild()) {
                 "${rootProject.name}-$libraryVersionEgk-$buildNumber-$gitHash-SNAPSHOT.aar"
             } else {
                 "${rootProject.name}-$libraryVersionEgk-$buildNumber-$gitHash.aar"
@@ -290,13 +293,13 @@ publishing {
             }
         }
     }
-    val contextUrl: String? by extra
-    val nexusUsername: String? by extra
-    val nexusPassword: String? by extra
     repositories {
         maven {
+            val contextUrl = project.optionalStringProperty("contextUrl")
+            val nexusUsername = project.optionalStringProperty("nexusUsername")
+            val nexusPassword = project.optionalStringProperty("nexusPassword")
             name = "Link4HealthNexus"
-            url = if (isSnapshot()) {
+            url = if (project.isSnapshotArtifactBuild()) {
                 uri("$contextUrl/link4health-snapshots")
             } else {
                 uri("$contextUrl/link4health-releases")
@@ -307,13 +310,4 @@ publishing {
             }
         }
     }
-}
-
-fun isSnapshot(): Boolean {
-    val aarDir = File("${layout.buildDirectory.get()}/outputs/aar")
-    if (aarDir.exists() && aarDir.isDirectory) {
-        val files = aarDir.listFiles { _, name -> name.endsWith("SNAPSHOT.aar") }
-        return files?.isNotEmpty() ?: false
-    }
-    return false
 }

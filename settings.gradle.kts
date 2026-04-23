@@ -2,11 +2,13 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     repositories {
-        val anonymous: String? by extra
-        val contextUrl: String? by extra
-        val nexusUsername: String? by extra
-        val nexusPassword: String? by extra
-        val anonymousAccess = anonymous?.toBoolean() ?: true
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+        val anonymousAccess = providers.gradleProperty("anonymous").orNull?.toBoolean() ?: true
+        val contextUrl = providers.gradleProperty("contextUrl").orNull
+        val nexusUsername = providers.gradleProperty("nexusUsername").orNull
+        val nexusPassword = providers.gradleProperty("nexusPassword").orNull
         if (anonymousAccess) {
             println("using anonymous access")
             mavenLocal()
@@ -35,11 +37,12 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        val anonymous: String? by extra
-        val contextUrl: String? by extra
-        val nexusUsername: String? by extra
-        val nexusPassword: String? by extra
-        val anonymousAccess = anonymous?.toBoolean() ?: true
+        google()
+        mavenCentral()
+        val anonymousAccess = providers.gradleProperty("anonymous").orNull?.toBoolean() ?: true
+        val contextUrl = providers.gradleProperty("contextUrl").orNull
+        val nexusUsername = providers.gradleProperty("nexusUsername").orNull
+        val nexusPassword = providers.gradleProperty("nexusPassword").orNull
         if (anonymousAccess) {
             println("using anonymous access")
             mavenLocal()

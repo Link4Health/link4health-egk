@@ -16,7 +16,6 @@ jobs:
       - name: Checkout EGK
         uses: actions/checkout@v4
         with:
-          repository: Link4Health/link4health-egk-library
           fetch-depth: 0
 
       - name: EGK grant execute permission for gradlew
@@ -43,10 +42,7 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-            ~/.gradle/gradle.properties
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/gradle/libs.versions.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          key: ${{ runner.os }}-gradle-v3-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/gradle/libs.versions.toml') }}
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
@@ -59,7 +55,7 @@ jobs:
       - name: Create gradle.properties
         run: |
           mkdir -p ~/.gradle
-          echo "nvdApiKey=${{ secrets.NVD_API_KEY }}" >> ~/.gradle/gradle.properties
+          echo "nvdApiKey=${{ secrets.NVD_API_KEY }}" > ~/.gradle/gradle.properties
           echo "contextUrl=${{ secrets.ARTIFACTS_CONTEXT_URL }}" >> ~/.gradle/gradle.properties
           echo "nexusUsername=${{ secrets.NEXUS_USERNAME }}" >> ~/.gradle/gradle.properties
           echo "nexusPassword=${{ secrets.NEXUS_PASSWORD }}" >> ~/.gradle/gradle.properties
