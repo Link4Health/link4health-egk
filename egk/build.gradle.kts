@@ -172,6 +172,7 @@ android {
         abortOnError = true
         warningsAsErrors = false
         checkDependencies = true
+        targetSdk = libs.versions.targetSdk.get().toInt()
         lintConfig = rootProject.file("lint.xml")
         disable += setOf(
             "AndroidGradlePluginVersion",
@@ -185,6 +186,10 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+    }
+
+    testOptions {
+        targetSdk = libs.versions.targetSdk.get().toInt()
     }
 
     buildTypes {
@@ -213,8 +218,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     kotlinOptions {

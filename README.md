@@ -29,16 +29,16 @@ up-to-date counterparts to maintain compatibility and extend support. We trust t
 
 To use this library, you must fulfill the following requirements:
 
-- compileSdk = "34"
-- minSDK = "30"
-- targetSdk = "34"
-- javaTarget = "17"
+- compileSdk = "35"
+- minSDK = "33"
+- targetSdk = "35"
+- javaTarget = "21"
 
 
 ::: {.caution}
 > [!CAUTION]
 > 
-> As of March 2023, security patches will only be provided for Android versions 11 and above. That is why we provide this SDK only for `minSDK = 30`!
+> This library supports Android 13 (API 33) and above to align with our current security and compatibility baseline.
 
 :::
 
