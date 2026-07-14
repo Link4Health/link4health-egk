@@ -1,8 +1,7 @@
 plugins {
-  `kotlin-dsl`
+    `kotlin-dsl`
 }
 
 kotlin {
-  jvmToolchain(libs.versions.javaTarget.get().toInt())
+    jvmToolchain(21)
 }
-

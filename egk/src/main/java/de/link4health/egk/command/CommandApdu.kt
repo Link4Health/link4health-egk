@@ -67,6 +67,9 @@ class CommandApdu(
      */
     val bytes get() = _apduBytes.copyOf()
 
+    /** Encoded APDU length without allocating a defensive byte-array copy. */
+    val size: Int get() = _apduBytes.size
+
     /**
      * Converts the bytes in the `bytes` list to a hexadecimal string representation.
      *
@@ -130,7 +133,7 @@ class CommandApdu(
                 "APDU header fields must not be greater than $MAX_APDU_HEADER_VALUE (0xFF)"
             }
             ne?.let {
-                require(ne <= EXPECTED_LENGTH_WILDCARD_EXTENDED || ne >= 0) {
+                require(it in 0..EXPECTED_LENGTH_WILDCARD_EXTENDED) {
                     "APDU response length is out of bounds [0, $EXPECTED_LENGTH_WILDCARD_EXTENDED]"
                 }
             }

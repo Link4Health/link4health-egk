@@ -15,7 +15,6 @@
  * limitations under the Licence.
  *
  */
-
 package de.link4health.egk.command
 
 import de.link4health.egk.card.ICardChannel
@@ -70,7 +69,7 @@ class HealthCardCommand(
         }
 
         val commandAPDU = CommandApdu.ofOptions(cla, ins, p1, p2, data, expectedLength)
-        val apduLength = commandAPDU.bytes.size
+        val apduLength = commandAPDU.size
         require(apduLength <= channel.maxTransceiveLength) {
             "CommandApdu is too long to send. Limit for Reader is " + channel.maxTransceiveLength +
                 " but length of commandApdu is " + apduLength

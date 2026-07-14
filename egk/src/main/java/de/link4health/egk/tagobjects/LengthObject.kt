@@ -15,7 +15,6 @@
  * limitations under the Licence.
  *
  */
-
 package de.link4health.egk.tagobjects
 
 import de.link4health.egk.command.EXPECTED_LENGTH_WILDCARD_SHORT
@@ -33,8 +32,9 @@ class LengthObject(le: Int) {
         private const val DO_97_TAG = 0x17
         private const val BYTE_MASK = 0xFF
         private const val BYTE_VALUE = 8
-        private var leData = ByteArray(0)
     }
+
+    private var leData = ByteArray(0)
 
     /**
      * Represents a tagged object using the DERTaggedObject class.

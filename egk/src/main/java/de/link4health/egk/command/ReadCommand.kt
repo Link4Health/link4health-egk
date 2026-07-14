@@ -15,7 +15,6 @@
  * limitations under the Licence.
  *
  */
-
 package de.link4health.egk.command
 
 import de.link4health.egk.identifier.ShortFileIdentifier

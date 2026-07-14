@@ -15,7 +15,6 @@
  * limitations under the Licence.
  *
  */
-
 package de.link4health.egk.exchange
 
 import de.link4health.egk.CardUtilities
@@ -57,14 +56,13 @@ class PaceInfo(cardAccess: ByteArray) {
      */
     val protocolID: String = protocol.id
 
-    private val ecNamedCurveParameterSpec = ECNamedCurveTable.getParameterSpec(
-        when (parameterID) {
-            PARAMETER256 -> "BrainpoolP256r1"
-            PARAMETER384 -> "BrainpoolP384r1"
-            PARAMETER512 -> "BrainpoolP512r1"
-            else -> ""
-        },
-    )
+    private val ecNamedCurveParameterSpec = when (parameterID) {
+        PARAMETER256 -> "BrainpoolP256r1"
+        PARAMETER384 -> "BrainpoolP384r1"
+        PARAMETER512 -> "BrainpoolP512r1"
+        else -> throw UnsupportedEgkCardException("Unsupported PACE parameter ID: $parameterID")
+    }.let(ECNamedCurveTable::getParameterSpec)
+        ?: throw UnsupportedEgkCardException("PACE curve is unavailable for parameter ID: $parameterID")
 
     /**
      * Provides the elliptic curve used in the PACE protocol.

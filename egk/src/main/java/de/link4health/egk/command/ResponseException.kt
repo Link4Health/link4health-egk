@@ -5,4 +5,13 @@ package de.link4health.egk.command
  *
  * @property responseStatus The response status that caused the exception.
  */
-class ResponseException(val responseStatus: ResponseStatus) : Exception()
+class ResponseException(
+    val responseStatus: ResponseStatus,
+    val statusWord: Int? = null,
+) : Exception(
+    buildString {
+        append("Card response status: ")
+        append(responseStatus)
+        statusWord?.let { append(" (SW=%04X)".format(it)) }
+    },
+)

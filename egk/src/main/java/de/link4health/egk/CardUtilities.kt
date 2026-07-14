@@ -41,6 +41,8 @@ object CardUtilities {
      * @return EC point generated from input data
      */
     fun byteArrayToECPoint(byteArray: ByteArray, curve: ECCurve): ECPoint {
+        require(byteArray.isNotEmpty()) { "EC point byte array must not be empty" }
+        require(byteArray.size % 2 == 1) { "EC point byte array must have odd length (0x04 || x || y)" }
         require(byteArray[0] == UNCOMPRESSEDPOINTVALUE.toByte()) {
             "Found no uncompressed point!"
         }
@@ -65,7 +67,8 @@ object CardUtilities {
         ASN1InputStream(asn1Input).use { asn1InputStream ->
             val seq = asn1InputStream.readObject() as ASN1TaggedObject
             val seqObj: ASN1Object = seq.baseObject
-            seqObj.encoded.copyOfRange(2, seqObj.encoded.size)
+            val encoded = seqObj.encoded
+            encoded.copyOfRange(2, encoded.size)
         }
 }
 

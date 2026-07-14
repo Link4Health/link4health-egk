@@ -213,6 +213,27 @@ class SecureMessagingTest {
     }
 
     @Test
+    fun decryptShouldFailWithTruncatedDo87Data() {
+        val secureMessaging = SecureMessaging(paceKey, ByteArray(BLOCK_SIZE))
+        // DO87 declares 0x30 bytes of data but the frame only contains a few bytes
+        val apduToDecrypt = ResponseApdu(Hex.decode("87300102030405060708099000"))
+        Assert.assertThrows(MalformedSecureMessagingApduException::class.java) {
+            secureMessaging.decrypt(apduToDecrypt)
+        }
+    }
+
+    @Test
+    fun decryptShouldFailWithOversizedDo87Length() {
+        val secureMessaging = SecureMessaging(paceKey, ByteArray(BLOCK_SIZE))
+        // DO87 uses a 4-byte length declaring ~2GB of data, which must be rejected
+        // instead of attempting the allocation
+        val apduToDecrypt = ResponseApdu(Hex.decode("87847FFFFFFF0102030405069000"))
+        Assert.assertThrows(MalformedSecureMessagingApduException::class.java) {
+            secureMessaging.decrypt(apduToDecrypt)
+        }
+    }
+
+    @Test
     @Throws(Exception::class)
     fun testDecryption() {
         val secureMessaging = SecureMessaging(paceKey, ByteArray(BLOCK_SIZE))

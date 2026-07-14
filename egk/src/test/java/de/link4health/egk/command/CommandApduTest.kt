@@ -333,6 +333,16 @@ class CommandApduTest {
         CommandApdu.ofOptions(0x01, 0x02, 0x03, 0x04, cmdData, null)
     }
 
+    @Test(expected = IllegalArgumentException::class)
+    fun testNegativeNeRejected() {
+        CommandApdu.ofOptions(0x01, 0x02, 0x03, 0x04, -1)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun testNeAboveWildcardExtendedRejected() {
+        CommandApdu.ofOptions(0x01, 0x02, 0x03, 0x04, EXPECTED_LENGTH_WILDCARD_EXTENDED + 1)
+    }
+
     @Test
     fun testCloning() {
         val dataSize = 65535

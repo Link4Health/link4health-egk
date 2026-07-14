@@ -15,7 +15,6 @@
  * limitations under the Licence.
  *
  */
-
 package de.link4health.egk.exchange
 
 import de.link4health.egk.Bytes
@@ -34,9 +33,19 @@ import de.link4health.egk.command.generalAuthenticate
 import de.link4health.egk.command.manageSecEnvWithoutCurves
 import de.link4health.egk.command.read
 import de.link4health.egk.command.select
+import de.link4health.egk.diagnostics.EgkDiagnosticEvent
+import de.link4health.egk.diagnostics.EgkDiagnosticOperation
+import de.link4health.egk.diagnostics.EgkDiagnosticStatus
+import de.link4health.egk.diagnostics.diagnosticsOrNone
+import de.link4health.egk.diagnostics.elapsedSince
+import de.link4health.egk.diagnostics.emitSafely
+import de.link4health.egk.diagnostics.toFailureCategory
 import de.link4health.egk.exchange.KeyDerivationFunction.getAES128Key
 import de.link4health.egk.identifier.FileIdentifier
 import de.link4health.egk.identifier.ShortFileIdentifier
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.bouncycastle.asn1.ASN1EncodableVector
 import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.asn1.BERTags
@@ -62,8 +71,20 @@ private const val TAG_49 = 0x49
  * picc = card
  * pcd = smartphone
  */
-suspend fun ICardChannel.establishTrustedChannel(cardAccessNumber: String): PaceKey {
-    val randomGenerator = SecureRandom.getInstanceStrong()
+suspend fun ICardChannel.establishTrustedChannel(cardAccessNumber: String): PaceKey = withContext(Dispatchers.IO) {
+    val channel = this@establishTrustedChannel
+    val diagnostics = diagnosticsOrNone()
+    val startNanos = System.nanoTime()
+    diagnostics.emitSafely(
+        EgkDiagnosticEvent(
+            operation = EgkDiagnosticOperation.PACE_NEGOTIATION,
+            status = EgkDiagnosticStatus.STARTED,
+            isSecureChannel = true,
+        ),
+    )
+    // The default SecureRandom on Android is non-blocking and cryptographically strong,
+    // while getInstanceStrong() may block on the kernel entropy pool at scan start.
+    val randomGenerator = SecureRandom()
 
     /**
      * Reads the supported PACE parameters from the card and performs the necessary steps to establish a trusted channel.
@@ -72,24 +93,43 @@ suspend fun ICardChannel.establishTrustedChannel(cardAccessNumber: String): Pace
      * @return The negotiated PaceKey.
      */
     suspend fun step0ReadSupportedPaceParameters(step1: suspend (paceInfo: PaceInfo) -> PaceKey): PaceKey {
+        diagnostics.emitSafely(
+            EgkDiagnosticEvent(
+                operation = EgkDiagnosticOperation.PACE_NEGOTIATION,
+                status = EgkDiagnosticStatus.STARTED,
+                phase = "read_supported_parameters",
+                isSecureChannel = true,
+            ),
+        )
         HealthCardCommand.select(selectParentElseRoot = false, readFirst = true).executeSuccessfulOn(
-            this,
+            channel,
         )
 
-        HealthCardCommand.read(ShortFileIdentifier(Ef.Version2.SFID), 0).executeSuccessfulOn(this).let {
-            check(HealthCardVersion2.of(it.apdu.data).isEGK21()) { "Invalid eGK Version." }
+        HealthCardCommand.read(ShortFileIdentifier(Ef.Version2.SFID), 0).executeSuccessfulOn(channel).let {
+            if (!HealthCardVersion2.of(it.apdu.data).isEGK21()) {
+                throw UnsupportedEgkCardException("Unsupported eGK version")
+            }
         }
 
         HealthCardCommand.select(FileIdentifier(Ef.CardAccess.FID), false)
-            .executeSuccessfulOn(this)
+            .executeSuccessfulOn(channel)
 
-        val paceInfo = PaceInfo(HealthCardCommand.read().executeOn(this).apdu.data)
+        val paceInfo = PaceInfo(HealthCardCommand.read().executeOn(channel).apdu.data)
 
         HealthCardCommand.manageSecEnvWithoutCurves(
             CardKey(SECRET_KEY_REFERENCE),
             false,
             paceInfo.paceInfoProtocolBytes,
-        ).executeSuccessfulOn(this)
+        ).executeSuccessfulOn(channel)
+
+        diagnostics.emitSafely(
+            EgkDiagnosticEvent(
+                operation = EgkDiagnosticOperation.PACE_NEGOTIATION,
+                status = EgkDiagnosticStatus.SUCCEEDED,
+                phase = "read_supported_parameters",
+                isSecureChannel = true,
+            ),
+        )
 
         return step1(paceInfo)
     }
@@ -110,7 +150,15 @@ suspend fun ICardChannel.establishTrustedChannel(cardAccessNumber: String): Pace
             pcdPk1: ByteArray,
         ) -> PaceKey,
     ): PaceKey {
-        val nonceZBytes = HealthCardCommand.generalAuthenticate(true).executeSuccessfulOn(this).apdu.data
+        diagnostics.emitSafely(
+            EgkDiagnosticEvent(
+                operation = EgkDiagnosticOperation.PACE_NEGOTIATION,
+                status = EgkDiagnosticStatus.STARTED,
+                phase = "ephemeral_key_step_1",
+                isSecureChannel = true,
+            ),
+        )
+        val nonceZBytes = HealthCardCommand.generalAuthenticate(true).executeSuccessfulOn(channel).apdu.data
         val nonceZBytesEncoded = extractKeyObjectEncoded(nonceZBytes)
         val canBytes = cardAccessNumber.toByteArray()
 
@@ -136,6 +184,15 @@ suspend fun ICardChannel.establishTrustedChannel(cardAccessNumber: String): Pace
         val pcdSkX1 = BigInteger(1, pk1Pcd)
         val pcdPkSkX1 = paceInfo.ecPointG.multiply(pcdSkX1)
 
+        diagnostics.emitSafely(
+            EgkDiagnosticEvent(
+                operation = EgkDiagnosticOperation.PACE_NEGOTIATION,
+                status = EgkDiagnosticStatus.SUCCEEDED,
+                phase = "ephemeral_key_step_1",
+                isSecureChannel = true,
+            ),
+        )
+
         return step2(paceInfo, nonceSInt, pcdSkX1, pcdPkSkX1.getEncoded(false))
     }
 
@@ -160,8 +217,16 @@ suspend fun ICardChannel.establishTrustedChannel(cardAccessNumber: String): Pace
             pcdPkS2: ByteArray,
         ) -> PaceKey,
     ): PaceKey {
+        diagnostics.emitSafely(
+            EgkDiagnosticEvent(
+                operation = EgkDiagnosticOperation.PACE_NEGOTIATION,
+                status = EgkDiagnosticStatus.STARTED,
+                phase = "ephemeral_key_step_2",
+                isSecureChannel = true,
+            ),
+        )
         val piccPk1Bytes =
-            HealthCardCommand.generalAuthenticate(true, pcdPk1, 1).executeSuccessfulOn(this).apdu.data
+            HealthCardCommand.generalAuthenticate(true, pcdPk1, 1).executeSuccessfulOn(channel).apdu.data
 
         val piccPk1BytesEncoded = extractKeyObjectEncoded(piccPk1Bytes)
         val y1 = byteArrayToECPoint(piccPk1BytesEncoded, paceInfo.ecCurve)
@@ -173,6 +238,15 @@ suspend fun ICardChannel.establishTrustedChannel(cardAccessNumber: String): Pace
 
         val pcdSkX2 = BigInteger(1, x2)
         val pcdPkS2 = pointGS.multiply(pcdSkX2)
+
+        diagnostics.emitSafely(
+            EgkDiagnosticEvent(
+                operation = EgkDiagnosticOperation.PACE_NEGOTIATION,
+                status = EgkDiagnosticStatus.SUCCEEDED,
+                phase = "ephemeral_key_step_2",
+                isSecureChannel = true,
+            ),
+        )
 
         return step3(paceInfo, pcdSkX2, pcdPkS2.getEncoded(false))
     }
@@ -193,10 +267,18 @@ suspend fun ICardChannel.establishTrustedChannel(cardAccessNumber: String): Pace
         step4: suspend (
             piccMacDerived: ByteArray,
             pcdMac: ByteArray,
-        ) -> Boolean,
+        ) -> Unit,
     ): PaceKey {
+        diagnostics.emitSafely(
+            EgkDiagnosticEvent(
+                operation = EgkDiagnosticOperation.PACE_NEGOTIATION,
+                status = EgkDiagnosticStatus.STARTED,
+                phase = "mutual_authentication",
+                isSecureChannel = true,
+            ),
+        )
         val piccPk2Bytes =
-            HealthCardCommand.generalAuthenticate(true, pcdPkS2, 3).executeSuccessfulOn(this).apdu.data
+            HealthCardCommand.generalAuthenticate(true, pcdPkS2, 3).executeSuccessfulOn(channel).apdu.data
 
         val piccPk2 = extractKeyObjectEncoded(piccPk2Bytes)
 
@@ -214,43 +296,86 @@ suspend fun ICardChannel.establishTrustedChannel(cardAccessNumber: String): Pace
         val pcdMac = deriveMac(paceKey.mac, piccPk2, paceInfo.protocolID)
         val piccMacDerived = deriveMac(paceKey.mac, pcdPkS2, paceInfo.protocolID)
 
-        require(step4(piccMacDerived, pcdMac))
+        step4(piccMacDerived, pcdMac)
+
+        diagnostics.emitSafely(
+            EgkDiagnosticEvent(
+                operation = EgkDiagnosticOperation.PACE_NEGOTIATION,
+                status = EgkDiagnosticStatus.SUCCEEDED,
+                phase = "mutual_authentication",
+                isSecureChannel = true,
+            ),
+        )
 
         return paceKey
     }
 
     /**
-     * Verifies the PCD (smartphone) and PICC (card) MAC (Message Authentication Code)
-     * by comparing the derived PICC MAC with the provided PCD MAC.
-     *
-     * @param piccMacDerived The derived PICC MAC as a byte array.
-     * @param pcdMac The provided PCD MAC as a byte array.
-     * @return True if the derived PICC MAC matches the provided PCD MAC, false otherwise.
-     */
-    fun step4VerifyPcdAndPiccMac(
-        piccMacDerived: ByteArray,
-        pcdMac: ByteArray,
-    ): Boolean {
-        val piccMacBytes =
-            HealthCardCommand.generalAuthenticate(false, pcdMac, 5)
-                .executeSuccessfulOn(this).apdu.data
-
-        val piccMac = extractKeyObjectEncoded(piccMacBytes)
-
-        return piccMac.contentEquals(piccMacDerived)
-    }
-
-    /**
      * Negotiate the PaceKey and return the object
      */
-    return step0ReadSupportedPaceParameters { paceInfo ->
-        step1EphemeralPublicKeyFirst(paceInfo) { _, nonceSInt, pcdSkX1, pcdPk1 ->
-            step2EphemeralPublicKeySecond(paceInfo, nonceSInt, pcdSkX1, pcdPk1) { _, pcdSkX2, pcdPkS2 ->
-                step3MutualAuthentication(paceInfo, pcdSkX2, pcdPkS2) { piccMacDerived, pcdMac ->
-                    step4VerifyPcdAndPiccMac(piccMacDerived, pcdMac)
+    return@withContext try {
+        step0ReadSupportedPaceParameters { paceInfo ->
+            step1EphemeralPublicKeyFirst(paceInfo) { _, nonceSInt, pcdSkX1, pcdPk1 ->
+                step2EphemeralPublicKeySecond(paceInfo, nonceSInt, pcdSkX1, pcdPk1) { _, pcdSkX2, pcdPkS2 ->
+                    step3MutualAuthentication(paceInfo, pcdSkX2, pcdPkS2) { piccMacDerived, pcdMac ->
+                        channel.step4VerifyPcdAndPiccMac(piccMacDerived, pcdMac)
+                    }
                 }
             }
         }
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        val failure =
+            when (e) {
+                is PaceKeyExchangeException -> e
+                is UnsupportedEgkCardException -> e
+                else -> PaceKeyExchangeException("PACE negotiation failed", e)
+            }
+        diagnostics.emitSafely(
+            EgkDiagnosticEvent(
+                operation = EgkDiagnosticOperation.PACE_NEGOTIATION,
+                status = EgkDiagnosticStatus.FAILED,
+                durationMillis = elapsedSince(startNanos),
+                isSecureChannel = true,
+                failureCategory = failure.toFailureCategory(),
+                failureType = failure::class.simpleName,
+            ),
+        )
+        throw failure
+    }.also {
+        diagnostics.emitSafely(
+            EgkDiagnosticEvent(
+                operation = EgkDiagnosticOperation.PACE_NEGOTIATION,
+                status = EgkDiagnosticStatus.SUCCEEDED,
+                durationMillis = elapsedSince(startNanos),
+                isSecureChannel = true,
+            ),
+        )
+    }
+}
+
+/**
+ * Verifies the PCD (smartphone) and PICC (card) MAC (Message Authentication Code)
+ * by comparing the derived PICC MAC with the provided PCD MAC.
+ *
+ * @param piccMacDerived The derived PICC MAC as a byte array.
+ * @param pcdMac The provided PCD MAC as a byte array.
+ * @throws PaceMacMismatchException if the card's MAC does not match the derived MAC,
+ * which almost always indicates a wrong CAN.
+ */
+private fun ICardChannel.step4VerifyPcdAndPiccMac(
+    piccMacDerived: ByteArray,
+    pcdMac: ByteArray,
+) {
+    val piccMacBytes =
+        HealthCardCommand.generalAuthenticate(false, pcdMac, 5)
+            .executeSuccessfulOn(this).apdu.data
+
+    val piccMac = extractKeyObjectEncoded(piccMacBytes)
+
+    if (!piccMac.contentEquals(piccMacDerived)) {
+        throw PaceMacMismatchException("PACE mutual authentication failed: MAC mismatch, CAN is likely incorrect")
     }
 }
 

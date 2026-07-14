@@ -23,6 +23,7 @@ import de.link4health.egk.cardobjects.Df
 import de.link4health.egk.cardobjects.Mf
 import de.link4health.egk.command.EXPECTED_LENGTH_WILDCARD_EXTENDED
 import de.link4health.egk.command.HealthCardCommand
+import de.link4health.egk.command.ResponseException
 import de.link4health.egk.command.ResponseStatus
 import de.link4health.egk.command.executeSuccessfulOn
 import de.link4health.egk.command.read
@@ -42,7 +43,8 @@ import java.io.ByteArrayOutputStream
  * Finally, the data in the buffer is converted to a byte array and returned as the certificate.
  *
  * @return The certificate as a byte array.
- * @throws IllegalStateException if the certificate couldn't be read.
+ * @throws ResponseException if the card returns an unexpected status.
+ * @throws CertificateReadException if the card returns success without certificate data.
  */
 fun ICardChannel.retrieveCertificate(): ByteArray {
     HealthCardCommand.select(ApplicationIdentifier(Df.Esign.AID)).executeSuccessfulOn(this)
@@ -67,14 +69,19 @@ fun ICardChannel.retrieveCertificate(): ByteArray {
         }
 
         when (response.status) {
-            ResponseStatus.SUCCESS -> {}
+            ResponseStatus.SUCCESS -> if (data.isEmpty()) {
+                throw CertificateReadException("Card returned success without certificate data at offset $offset")
+            }
             ResponseStatus.END_OF_FILE_WARNING,
             ResponseStatus.OFFSET_TOO_BIG,
             -> break
 
-            else -> error("Couldn't read certificate: ${response.status}")
+            else -> throw ResponseException(response.status, response.apdu.sw)
         }
     }
 
     return buffer.toByteArray()
 }
+
+/** Certificate data could not be read despite a successful card status. */
+class CertificateReadException(message: String) : java.io.IOException(message)

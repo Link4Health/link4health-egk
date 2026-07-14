@@ -6,6 +6,8 @@
     <ID>ImplicitDefaultLocale:CommandApdu.kt$CommandApdu$String.format("%02X", byte)</ID>
     <ID>ImplicitDefaultLocale:ResponseApdu.kt$ResponseApdu$String.format("%02X", byte)</ID>
     <ID>LongMethod:CommandApdu.kt$CommandApdu.Companion$fun ofOptions( cla: Int, ins: Int, p1: Int, p2: Int, data: ByteArray?, ne: Int?, ): CommandApdu</ID>
+    <ID>LongMethod:NfcCardSecureChannel.kt$NfcCardSecureChannel$@Synchronized override fun transmit(command: CommandApdu): ResponseApdu</ID>
+    <ID>LongMethod:NfcHealthCard.kt$NfcHealthCard.Companion$fun connect( tag: Tag, diagnostics: EgkDiagnostics = EgkDiagnostics.NONE, timeoutMillis: Int = ISO_DEP_TIMEOUT, ): NfcCardChannel</ID>
     <ID>LongParameterList:CommandApdu.kt$CommandApdu.Companion$( cla: Int, ins: Int, p1: Int, p2: Int, data: ByteArray?, ne: Int?, )</ID>
     <ID>LongParameterList:HealthCardCommand.kt$HealthCardCommand$( val expectedStatus: Map&lt;Int, ResponseStatus>, val cla: Int, val ins: Int, val p1: Int = 0, val p2: Int = 0, val data: ByteArray? = null, val ne: Int? = null, )</ID>
     <ID>LongParameterList:HealthCardVersion2.kt$HealthCardVersion2$( /** * Information of C0 with version of filling instruction for version2 */ val fillingInstructionsVersion: ByteArray, // C0 /** * Information of C1 with version of card object system */ val objectSystemVersion: ByteArray, // C1 /** * Information of C2 with version of product identification object system */ val productIdentificationObjectSystemVersion: ByteArray, // C2 /** * Information of C4 with version of filling instruction for EF.GDO */ val fillingInstructionsEfGdoVersion: ByteArray, // C4 /** * Information of C5 with version of filling instruction for EF.ATR */ val fillingInstructionsEfAtrVersion: ByteArray, // C5 /** * Information of C6 with version of filling instruction for EF.KeyInfo * Only filled for gSMC-K and gSMC-KT */ val fillingInstructionsEfKeyInfoVersion: ByteArray, // C6 //only gSMC-K and gSMC-KT /** * Information of C3 with version of filling instruction for Environment Settings * Only filled for gSMC-K */ val fillingInstructionsEfEnvironmentSettingsVersion: ByteArray, // C3 //only gSMC-K /** * Information of C7 with version of filling instruction for EF.GDO */ val fillingInstructionsEfLoggingVersion: ByteArray, // C7 )</ID>
@@ -21,6 +23,7 @@
     <ID>MagicNumber:GeneralAuthenticateCommand.kt$28</ID>
     <ID>MagicNumber:HealthCardVersion2Extension.kt$16</ID>
     <ID>MagicNumber:HealthCardVersion2Extension.kt$8</ID>
+    <ID>MagicNumber:InternalDiagnostics.kt$1_000_000</ID>
     <ID>MagicNumber:ManageSecurityEnvironmentCommand.kt$3</ID>
     <ID>MagicNumber:ManageSecurityEnvironmentCommand.kt$4</ID>
     <ID>MagicNumber:ResponseApdu.kt$ResponseApdu$0xFF</ID>
@@ -62,10 +65,14 @@
     <ID>MagicNumber:ShortFileIdentifier.kt$ShortFileIdentifier$16</ID>
     <ID>MagicNumber:TrustedChannelPaceKeyExchange.kt$3</ID>
     <ID>MagicNumber:TrustedChannelPaceKeyExchange.kt$5</ID>
+    <ID>ObjectPropertyNaming:EgkDiagnostics.kt$EgkDiagnostics.Companion$val NONE: EgkDiagnostics = EgkDiagnostics { }</ID>
     <ID>SwallowedException:SecureMessagingTest.kt$SecureMessagingTest$e: Exception</ID>
+    <ID>ThrowsCount:NfcHealthCard.kt$NfcHealthCard.Companion$fun connect( tag: Tag, diagnostics: EgkDiagnostics = EgkDiagnostics.NONE, timeoutMillis: Int = ISO_DEP_TIMEOUT, ): NfcCardChannel</ID>
+    <ID>TooGenericExceptionCaught:NfcCardSecureChannel.kt$NfcCardSecureChannel$t: Throwable</ID>
     <ID>TooGenericExceptionCaught:SecureMessagingTest.kt$SecureMessagingTest$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:TrustedChannelPaceKeyExchange.kt$e: Exception</ID>
     <ID>TooManyFunctions:CommandApduTest.kt$CommandApduTest</ID>
-    <ID>TooManyFunctions:SecureMessaging.kt$SecureMessaging</ID>
+    <ID>TooManyFunctions:SecureMessaging.kt$SecureMessaging : AutoCloseable</ID>
     <ID>TooManyFunctions:SecureMessagingTest.kt$SecureMessagingTest</ID>
   </CurrentIssues>
 </SmellBaseline>

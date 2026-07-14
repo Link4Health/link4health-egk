@@ -1,12 +1,3 @@
-/*
- *  (C)opyright 2024 eHealth experts GmbH
- *
- *  This code was created by Normen Düring, owned by eHealth experts GmbH.
- *  Any unauthorized use, distribution, reproduction, or disclosure
- *  of this code, or any parts of it, in any form is prohibited.
- *
- *  For any questions, comments or suggestions, please contact normen.duering@ehealthexperts.de
- */
 package de.link4health.egk
 
 import kotlin.io.encoding.Base64

@@ -15,7 +15,6 @@
  * limitations under the Licence.
  *
  */
-
 package de.link4health.egk
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider

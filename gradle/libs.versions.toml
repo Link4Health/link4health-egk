@@ -1,55 +1,58 @@
 [versions]
-dependencyCheckGradle = "10.0.3"
+# Build tools
+dependencyCheckGradle = "12.2.0"
 gradleLicenseReport = "2.9"
-kotlinxCoroutinesCore = "1.8.0"
-mockk = "1.13.5"
-snakeyaml = "2.3"
-sonarqubeGradlePlugin = "5.1.0.4882"
-detekt = "1.23.4"
+sonarqubeGradlePlugin = "7.2.3.7755"
+detekt = "1.23.8"
 jacoco = "0.8.11"
 dokka = "1.9.20"
-agp = "8.10.1"
-gradle-wrapper = "8.10.2"
+agp = "8.13.0"
+gradle-wrapper = "8.13"
 spotless = "7.0.0.BETA2"
 
 compileSdk = "35"
 minSDK = "30"
 targetSdk = "35"
-javaTarget = "17"
+javaTarget = "21"
 
-kotlin = "2.0.21"
+# Kotlin
+kotlin = "2.3.20"
+kotlinxCoroutinesCore = "1.8.0"
 
-napier = "2.7.1"
-
+# Testing
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
+mockk = "1.13.5"
 
+# Libraries
 bcpkixJdk18on = "1.78.1"
+napier = "2.7.1"
 
 [libraries]
-
+# Kotlin
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
-napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 
+# Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 
+# Bouncy Castle
 bcpkix-jdk18on = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bcpkixJdk18on" }
 bcprov-jdk18on = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bcpkixJdk18on" }
-snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
+
+# Utilities
+napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 
 [plugins]
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-
 dokka-documentation = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 sonarqube = { id = "org.sonarqube", version.ref = "sonarqubeGradlePlugin" }
-dedekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dependency-check-gradle = { id = "org.owasp.dependencycheck", version.ref = "dependencyCheckGradle" }
 gradle-license-report = { id = "com.github.jk1.dependency-license-report", version.ref = "gradleLicenseReport" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

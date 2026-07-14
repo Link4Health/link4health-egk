@@ -15,7 +15,6 @@
  * limitations under the Licence.
  *
  */
-
 package de.link4health.egk.card
 
 import org.bouncycastle.asn1.ASN1InputStream

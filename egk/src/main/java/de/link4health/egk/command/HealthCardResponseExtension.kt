@@ -8,6 +8,6 @@ package de.link4health.egk.command
  */
 fun HealthCardResponse.requireSuccess() {
     if (this.status != ResponseStatus.SUCCESS) {
-        throw ResponseException(this.status)
+        throw ResponseException(this.status, this.apdu.sw)
     }
 }

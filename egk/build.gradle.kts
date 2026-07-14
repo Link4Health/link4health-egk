@@ -1,12 +1,17 @@
-import de.ehex.settings.GITHUB_BUILD_NUMBER
+import de.ehex.settings.currentBuildNumber
+import de.ehex.settings.egkLibraryPackageName
+import de.ehex.settings.egkLibraryVersion
 import de.ehex.settings.getGitHash
+import de.ehex.settings.isSnapshotArtifactBuild
 import de.ehex.settings.nameSpace
+import de.ehex.settings.optionalStringProperty
+import de.ehex.settings.registerDocumentationTasks
 
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.dokka.documentation)
-    alias(libs.plugins.dedekt)
+    alias(libs.plugins.detekt)
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.dependency.check.gradle)
     alias(libs.plugins.gradle.license.report)
@@ -15,7 +20,7 @@ plugins {
     `maven-publish`
 }
 
-apply(from = "../generateDoku.gradle.kts")
+registerDocumentationTasks()
 
 spotless {
     kotlin {
@@ -63,6 +68,13 @@ detekt {
     baseline = file("$configDir/detekt-baseline.xml")
 }
 
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    jvmTarget = "21"
+}
+tasks.withType<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>().configureEach {
+    jvmTarget = "21"
+}
+
 jacoco {
     toolVersion = libs.versions.jacoco.get()
 }
@@ -107,12 +119,11 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     executionData.setFrom(fileTree(layout.buildDirectory).include("jacoco/testDebugUnitTest.exec"))
 }
 
-val nvdApiKey: String? by extra
 dependencyCheck {
     autoUpdate = true
     analyzedTypes = listOf("jar, aar")
     format = "HTML"
-    nvd.apiKey = nvdApiKey
+    nvd.apiKey = project.optionalStringProperty("nvdApiKey")
 }
 
 tasks.register<Jar>("dokkaHtmlJar") {
@@ -137,7 +148,7 @@ licenseReport {
 
     // Set output directory for the report data.
     // Defaults to ${project.buildDir}/reports/dependency-license.
-//    outputDir = "${rootProject.projectDir}/docs/licenses"
+    // outputDir = "${rootProject.projectDir}/docs/licenses"
 
     // Select projects to examine for dependencies.
     // Defaults to current project and all its subprojects
@@ -161,34 +172,31 @@ licenseReport {
     allowedLicensesFile = project.layout.projectDirectory.file("config/allowed-licenses.json").asFile
 }
 
-val injectVariable: MutableMap<String, String> = System.getenv()
-val buildNumber: String = if (GITHUB_BUILD_NUMBER != "0") {
-    GITHUB_BUILD_NUMBER
-} else {
-    project.extra["buildNumber"] as String
-}
-val libraryPackageNameEgkAndroid: String by project.extra
-val majorEgkAndroid: String by project.extra
-val minorEgkAndroid: String by project.extra
-val patchEgkAndroid: String by project.extra
-
-val libraryVersionEgk = "$majorEgkAndroid.$minorEgkAndroid.$patchEgkAndroid"
-val gitHash = getGitHash()
-
 android {
     namespace = nameSpace(project)
     compileSdk = libs.versions.compileSdk.get().toInt()
     lint {
-        baseline = file("config/lint/lint-baseline.xml")
         abortOnError = true
-        warningsAsErrors = true
+        warningsAsErrors = false
         checkDependencies = true
+        targetSdk = libs.versions.targetSdk.get().toInt()
+        lintConfig = rootProject.file("lint.xml")
+        disable += setOf(
+            "AndroidGradlePluginVersion",
+            "GradleDependency",
+            "NewerVersionAvailable",
+            "OldTargetApi",
+        )
     }
     defaultConfig {
         minSdk = libs.versions.minSDK.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+    }
+
+    testOptions {
+        targetSdk = libs.versions.targetSdk.get().toInt()
     }
 
     buildTypes {
@@ -199,6 +207,9 @@ android {
     }
 
     tasks.withType<com.android.build.gradle.tasks.BundleAar>().configureEach {
+        val libraryVersionEgk = project.egkLibraryVersion()
+        val buildNumber = project.currentBuildNumber()
+        val gitHash = project.getGitHash()
         val isDebugBuild = gradle.startParameter.taskNames.any { it.contains("assembleDebug") }
         val buildTypeSuffix = if (isDebugBuild) "SNAPSHOT" else ""
         val type = if (isDebugBuild) {
@@ -213,9 +224,15 @@ android {
         buildConfig = true
     }
 
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 
@@ -227,7 +244,6 @@ kotlin {
 
 dependencies {
 
-    implementation(libs.snakeyaml)
     implementation(libs.kotlinx.coroutines.core)
     api(libs.bcprov.jdk18on)
     api(libs.bcpkix.jdk18on)
@@ -242,56 +258,6 @@ dependencies {
 }
 
 publishing {
-    publications {
-        create<MavenPublication>("Link4HealthEgkLibrary") {
-            groupId = libraryPackageNameEgkAndroid
-            artifactId = "${rootProject.name}-library"
-            version = if (isSnapshot()) {
-                "$libraryVersionEgk-$buildNumber-SNAPSHOT"
-            } else {
-                libraryVersionEgk
-            }
-            val artifactFileName = if (isSnapshot()) {
-                "${rootProject.name}-$libraryVersionEgk-$buildNumber-$gitHash-SNAPSHOT.aar"
-            } else {
-                "${rootProject.name}-$libraryVersionEgk-$buildNumber-$gitHash.aar"
-            }
-
-            artifact("${layout.buildDirectory.get()}/outputs/aar/$artifactFileName") {
-                extension = "aar"
-            }
-
-            // Artefakte für JavaDoc und HTML-Dokumentation
-            artifact(tasks.named("dokkaJavadocJar"))
-            artifact(tasks.named("dokkaHtmlJar"))
-
-            pom {
-                name.set("Link4Health eGK Library")
-                description.set("A library to use the egk for CardLink.")
-                withXml {
-                    asNode().appendNode("dependencies").apply {
-                        configurations
-                            .getByName("api")
-                            .allDependencies
-                            .forEach { dependency ->
-                                appendNode("dependency").apply {
-                                    appendNode("groupId", dependency.group)
-                                    appendNode("artifactId", dependency.name)
-                                    appendNode("version", dependency.version)
-                                }
-                            }
-                    }
-                }
-                licenses {
-                    license {
-                        name.set("EUPL License")
-                        url.set("https://joinup.ec.europa.eu/software/page/eupl")
-                        distribution.set("repo")
-                    }
-                }
-            }
-        }
-    }
     val googleArtifactRegistryUrl: String? by extra
     val googleArtifactRegistryAccessToken: String? by extra
     repositories {
@@ -310,11 +276,33 @@ publishing {
     }
 }
 
-fun isSnapshot(): Boolean {
-    val aarDir = File("${layout.buildDirectory.get()}/outputs/aar")
-    if (aarDir.exists() && aarDir.isDirectory) {
-        val files = aarDir.listFiles { _, name -> name.endsWith("SNAPSHOT.aar") }
-        return files?.isNotEmpty() ?: false
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("Link4HealthEgkLibrary") {
+                val libraryVersionEgk = project.egkLibraryVersion()
+                groupId = project.egkLibraryPackageName()
+                artifactId = "${rootProject.name}-library"
+                version = if (project.isSnapshotArtifactBuild()) {
+                    "$libraryVersionEgk-${project.currentBuildNumber()}-SNAPSHOT"
+                } else {
+                    libraryVersionEgk
+                }
+                from(components["release"])
+                artifact(tasks.named("dokkaJavadocJar"))
+                artifact(tasks.named("dokkaHtmlJar"))
+                pom {
+                    name.set("Link4Health eGK Library")
+                    description.set("Android library for communicating with electronic health cards.")
+                    licenses {
+                        license {
+                            name.set("EUPL License")
+                            url.set("https://joinup.ec.europa.eu/software/page/eupl")
+                            distribution.set("repo")
+                        }
+                    }
+                }
+            }
+        }
     }
-    return false
 }

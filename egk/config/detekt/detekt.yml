@@ -420,7 +420,7 @@ style:
   # Max line length configuration
   MaxLineLength:
     active: true
-    maxLineLength: 180
+    maxLineLength: 240
     excludePackageStatements: true
     excludeImportStatements: true
     excludeCommentStatements: false

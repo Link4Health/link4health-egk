@@ -13,6 +13,9 @@ import de.link4health.egk.identifier.ShortFileIdentifier
  */
 object EGKCommands {
 
+    /** gemSpec_COS key reference for the symmetric card-to-card authentication key. */
+    private const val INTERNAL_AUTHENTICATION_KEY_REFERENCE = 9
+
     /**
      * Selects the root of the object system, either by selecting the parent folder or the AID.
      * Can also read the File Control Parameter (FCP) if specified.
@@ -24,12 +27,17 @@ object EGKCommands {
     }
 
     /**
-     * Selects the internal key for symmetric card connection without curves.
+     * Selects the gemSpec_COS internal authentication key. Key reference 9 identifies
+     * the symmetric card-to-card key; the zero OID selects the algorithm associated with it.
      *
      * @return A [HealthCardCommand] object representing the command to select the internal key
      */
     fun selectInternal(): HealthCardCommand {
-        return HealthCardCommand.selectInternal(cardKey = CardKey(9), dfSpecific = false, byteArrayOf(0))
+        return HealthCardCommand.selectInternal(
+            cardKey = CardKey(INTERNAL_AUTHENTICATION_KEY_REFERENCE),
+            dfSpecific = false,
+            oid = byteArrayOf(0),
+        )
     }
 
     /**

@@ -15,7 +15,6 @@
  * limitations under the Licence.
  *
  */
-
 package de.link4health.egk.card
 
 import de.link4health.egk.BCProvider
@@ -62,9 +61,16 @@ private const val MALFORMED_SECURE_MESSAGING_APDU = "Malformed Secure Messaging 
 /**
  * Represents a class for secure messaging using a given PaceKey.
  *
+ * This class is **not thread-safe**. The internal send sequence counter ([secureMessagingSSC])
+ * is mutated on every encrypt/decrypt call. Since NFC communication is inherently sequential
+ * (one APDU at a time), synchronization overhead is unnecessary, but callers must not share
+ * an instance across threads.
+ *
  * @param paceKey The PaceKey for the secure messaging session.
  */
-class SecureMessaging(private val paceKey: PaceKey, private val ecbIv: ByteArray) {
+class SecureMessaging(paceKey: PaceKey, ecbIv: ByteArray) : AutoCloseable {
+    private val paceKey = PaceKey(paceKey.enc.copyOf(), paceKey.mac.copyOf())
+    private val ecbIv = ecbIv.copyOf()
     private val secureMessagingSSC: ByteArray = ByteArray(BLOCK_SIZE)
 
     private fun incrementSSC() {
@@ -87,7 +93,7 @@ class SecureMessaging(private val paceKey: PaceKey, private val ecbIv: ByteArray
 
         incrementSSC()
 
-        require(apduToEncrypt.size >= HEADER_SIZE) { "APDU must be at least 4 bytes long" }
+        if (apduToEncrypt.size < HEADER_SIZE) throw MalformedSecureMessagingApduException("APDU must be at least 4 bytes long")
 
         val header = apduToEncrypt.copyOfRange(0, HEADER_SIZE)
         setSecureMessagingCommand(header)
@@ -124,7 +130,7 @@ class SecureMessaging(private val paceKey: PaceKey, private val ecbIv: ByteArray
     }
 
     private fun setSecureMessagingCommand(header: ByteArray) {
-        require(header[0] != (header[0] or SECURE_MESSAGING_COMMAND)) { MALFORMED_SECURE_MESSAGING_APDU }
+        if (header[0] == (header[0] or SECURE_MESSAGING_COMMAND)) throw MalformedSecureMessagingApduException(MALFORMED_SECURE_MESSAGING_APDU)
         header[0] = (header[0] or SECURE_MESSAGING_COMMAND)
     }
 
@@ -175,7 +181,7 @@ class SecureMessaging(private val paceKey: PaceKey, private val ecbIv: ByteArray
 
         val responseDataOutput = ByteArrayOutputStream()
 
-        require(apduResponseBytes.size >= MIN_RESPONSE_SIZE) { MALFORMED_SECURE_MESSAGING_APDU }
+        if (apduResponseBytes.size < MIN_RESPONSE_SIZE) throw MalformedSecureMessagingApduException(MALFORMED_SECURE_MESSAGING_APDU)
 
         incrementSSC()
 
@@ -197,7 +203,7 @@ class SecureMessaging(private val paceKey: PaceKey, private val ecbIv: ByteArray
     }
 
     private fun checkMac(mac: ByteArray, macObject: ByteArray) {
-        require(mac.contentEquals(macObject)) { "Secure Messaging MAC verification failed" }
+        if (!mac.contentEquals(macObject)) throw SecureMessagingMacException("Secure Messaging MAC verification failed")
     }
 
     private fun getResponseObjects(
@@ -215,39 +221,48 @@ class SecureMessaging(private val paceKey: PaceKey, private val ecbIv: ByteArray
             dataTag = tag
 
             var size = inputStream.read()
+            if (size < 0) throw MalformedSecureMessagingApduException(MALFORMED_SECURE_MESSAGING_APDU)
             if (size > LENGTH_TAG) {
                 val sizeBytes = ByteArray(size and BYTE_MASK)
 
-                inputStream.readAndCheckExpectedLength(sizeBytes, sizeBytes.size)
+                inputStream.readAndCheckExpectedLength(sizeBytes = sizeBytes, expected = sizeBytes.size)
 
                 size = BigInteger(1, sizeBytes).toInt()
             }
+            // A declared data length can never exceed what is left in the response frame.
+            if (size < 0 || size > inputStream.available()) {
+                throw MalformedSecureMessagingApduException(MALFORMED_SECURE_MESSAGING_APDU)
+            }
 
             data = ByteArray(size)
-            inputStream.readAndCheckExpectedLength(data, data.size)
+            inputStream.readAndCheckExpectedLength(sizeBytes = data, expected = data.size)
 
             tag = inputStream.read().toByte()
         }
 
-        require(tag == DO_99_TAG.toByte()) { MALFORMED_SECURE_MESSAGING_APDU }
+        checkTag(tag, DO_99_TAG.toByte())
 
         if (inputStream.read() == STATUS_SIZE) {
-            inputStream.readAndCheckExpectedLength(statusBytes, STATUS_SIZE)
+            inputStream.readAndCheckExpectedLength(sizeBytes = statusBytes, expected = STATUS_SIZE)
 
             tag = inputStream.read().toByte()
         }
 
-        require(tag == DO_8E_TAG.toByte()) { MALFORMED_SECURE_MESSAGING_APDU }
+        checkTag(tag, DO_8E_TAG.toByte())
 
         if (inputStream.read() == MAC_SIZE) {
-            inputStream.readAndCheckExpectedLength(macBytes, MAC_SIZE)
+            inputStream.readAndCheckExpectedLength(sizeBytes = macBytes, expected = MAC_SIZE)
         }
 
-        require(inputStream.available() == 2) { MALFORMED_SECURE_MESSAGING_APDU }
+        checkTag(inputStream.available().toByte(), 2.toByte())
 
         return data?.let {
             DataObject(it, dataTag)
         }
+    }
+
+    private fun checkTag(actual: Byte, expected: Byte) {
+        if (actual != expected) throw MalformedSecureMessagingApduException(MALFORMED_SECURE_MESSAGING_APDU)
     }
 
     private fun createDecryptedResponse(
@@ -289,16 +304,15 @@ class SecureMessaging(private val paceKey: PaceKey, private val ecbIv: ByteArray
             it.init(ENCRYPT_MODE, key, aps)
             it.doFinal(secureMessagingSSC)
         }
-//    private fun createCipherIV(): ByteArray =
-//        // ECB instead of CBC on purpose. COS doesn't support CBC for this.
-//        Cipher.getInstance("AES/ECB/NoPadding", BCProvider).let {
-//            val key: Key = SecretKeySpec(paceKey.enc, "AES")
-//            it.init(ENCRYPT_MODE, key)
-//            it.doFinal(secureMessagingSSC)
-//        }
+
+    override fun close() {
+        paceKey.close()
+        ecbIv.fill(0)
+        secureMessagingSSC.fill(0)
+    }
 }
 
-private fun InputStream.readAndCheckExpectedLength(b: ByteArray, expected: Int) {
-    val l = this.read(b, 0, expected)
-    require(l == expected) { MALFORMED_SECURE_MESSAGING_APDU }
+private fun InputStream.readAndCheckExpectedLength(sizeBytes: ByteArray, expected: Int) {
+    val l = this.read(sizeBytes, 0, expected)
+    if (l != expected) throw MalformedSecureMessagingApduException(MALFORMED_SECURE_MESSAGING_APDU)
 }

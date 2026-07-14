@@ -15,13 +15,15 @@
  * limitations under the Licence.
  *
  */
-
 package de.link4health.egk.card
 
 /**
- * Pace Key for TrustedChannel with Session key for encoding and Session key for message authentication
+ * Pace Key for TrustedChannel with Session key for encoding and Session key for message authentication.
+ *
+ * Implements [AutoCloseable] to allow clearing key material from memory when no longer needed.
+ * Use with Kotlin's `use {}` block for automatic cleanup.
  */
-data class PaceKey(val enc: ByteArray, val mac: ByteArray) {
+data class PaceKey(val enc: ByteArray, val mac: ByteArray) : AutoCloseable {
     /**
      * Checks whether the specified object is equal to this PaceKey.
      *
@@ -53,5 +55,10 @@ data class PaceKey(val enc: ByteArray, val mac: ByteArray) {
         var result = enc.contentHashCode()
         result = 31 * result + mac.contentHashCode()
         return result
+    }
+
+    override fun close() {
+        enc.fill(0)
+        mac.fill(0)
     }
 }
