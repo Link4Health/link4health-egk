@@ -1,7 +1,7 @@
-# 4.0.0-beta-1
+# 4.0.1
 
-The version jumps from 1.0.4 to 4.0.0 to align the eGK library with the CardLink SDK release line.
-This is a pre-release; the final 4.0.0 will follow after beta feedback.
+First stable release of the 4.x line. The version jumps from 1.0.4 to 4.x to align the eGK library with the CardLink SDK release line.
+There are no library code changes since 4.0.0-beta-1; the notes below summarize all changes since 1.0.4.
 
 ## Added
 
@@ -16,7 +16,7 @@ This is a pre-release; the final 4.0.0 will follow after beta feedback.
 - **Breaking:** `NfcHealthCard` constructor is now `internal`; obtain instances via `NfcHealthCard.connect(...)`.
 - Hardened NFC layer: explicit connection-state checks, failure categorization, and transmit failure reporting.
 - `ICardChannel.establishTrustedChannel` now runs on `Dispatchers.IO` and fails with the typed PACE exceptions above.
-- Publishing moved from the Link4Health Nexus repository to Google Artifact Registry.
+- Publishing moved from the Link4Health Nexus repository to Google Artifact Registry; the repository URL is unchanged.
 - Toolchain upgrade: Kotlin 2.3.20, Java target 21, AGP 8.13.0, Gradle 8.13.
 
 ## Removed
@@ -26,3 +26,4 @@ This is a pre-release; the final 4.0.0 will follow after beta feedback.
 ## Fixed
 
 - Gradle wrapper version mismatch and a build failure caused by the AGP version.
+- README stated a minimum of Android 13 (API 33); the library supports Android 11 (API 30) and above.

@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.1] - 2026-10-01
+
+First stable release of the 4.x line. No library code changes since 4.0.0-beta-1.
+
+### Changed
+
+- Documentation describes the Link4Health Maven repository as backed by Google Artifact
+  Registry instead of Nexus; the repository URL is unchanged.
+
+### Fixed
+
+- README stated a minimum of Android 13 (API 33); the library supports Android 11 (API 30)
+  and above, matching the build's `minSdk`.
+
 ## [4.0.0-beta-1] - 2026-07-28
 
 The version jumps from 1.0.4 to 4.0.0 to align the eGK library with the CardLink SDK release line.

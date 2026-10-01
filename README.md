@@ -44,9 +44,9 @@ To use this library, you must fulfill the following requirements:
 
 ### Adding Dependencies to Your Application
 
-This library is not yet available on Maven Central. You can include it in your project using the Link4Health Nexus repository. You can use the composite build feature from Gradle or build the library as an aar.
+This library is not yet available on Maven Central. You can include it in your project using the Link4Health Maven repository, which is backed by Google Artifact Registry (the repository URL is unchanged). You can use the composite build feature from Gradle or build the library as an aar.
 
-**1. Include the Link4Health Nexus Repository:**
+**1. Include the Link4Health Maven Repository:**
 
 Add the following to your project's `settings.gradle.kts` file:
 
@@ -56,7 +56,7 @@ dependencyResolutionManagement {
         mavenCentral()
         google()
         maven {
-            name = "Link4Health Nexus"
+            name = "Link4Health"
             // Supplied by Link4Health together with repository credentials.
             url = uri(providers.gradleProperty("link4HealthRepositoryUrl").get())
             mavenContent {
