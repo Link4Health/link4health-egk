@@ -30,7 +30,7 @@ up-to-date counterparts to maintain compatibility and extend support. We trust t
 To use this library, you must fulfill the following requirements:
 
 - compileSdk = "35"
-- minSDK = "33"
+- minSDK = "30"
 - targetSdk = "35"
 - javaTarget = "21"
 
@@ -38,7 +38,7 @@ To use this library, you must fulfill the following requirements:
 ::: {.caution}
 > [!CAUTION]
 > 
-> This library supports Android 13 (API 33) and above to align with our current security and compatibility baseline.
+> This library supports Android 11 (API 30) and above to align with our current security and compatibility baseline.
 
 :::
 
