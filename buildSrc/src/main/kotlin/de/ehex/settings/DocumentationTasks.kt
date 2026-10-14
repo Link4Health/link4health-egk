@@ -2,7 +2,6 @@ package de.ehex.settings
 
 import org.gradle.api.Project
 import java.io.File
-import java.util.Properties
 import kotlin.text.Regex
 
 private const val PANDOC = "pandoc"
@@ -10,13 +9,13 @@ private const val PANDOC = "pandoc"
 fun Project.registerDocumentationTasks() {
     tasks.register("generateDocIndexHtml") {
         group = "documentation"
-        description = "Generates the index.html from README.md, RELEASENOTES.md and template."
+        description = "Generates the index.html from README.md, CHANGELOG.md and template."
 
         dependsOn("dokkaHtml")
         dependsOn("generateLicenseReport")
 
         val readmeFile = file("../README.md")
-        val releaseNotesFile = file("../RELEASENOTES.md")
+        val releaseNotesFile = file("../CHANGELOG.md")
         val templateFile = file("../docs/index_template.html")
         val outputDirectory = file("../docs")
         val outputFile = File(outputDirectory, "index.html")
@@ -54,11 +53,11 @@ fun Project.registerDocumentationTasks() {
                         "html",
                     )
                 } else {
-                    println("RELEASENOTES.md file does not exist!")
+                    println("CHANGELOG.md file does not exist!")
                     ""
                 }
 
-                val versionTag = "v${getVersionFromProperties()}"
+                val versionTag = "v${egkLibraryVersion()}"
                 println("Version Tag: $versionTag")
 
                 val versionDirectory = File(outputDirectory, "releases/$versionTag")
@@ -188,20 +187,4 @@ private fun runCommandWithInput(input: String, vararg command: String): String {
 
     process.outputStream.bufferedWriter().use { it.write(input) }
     return process.inputStream.bufferedReader().use { it.readText() }.trim()
-}
-
-private fun Project.getVersionFromProperties(): String {
-    val propertiesFile = file("../gradle.properties")
-    if (!propertiesFile.exists()) {
-        throw RuntimeException("gradle.properties file not found!")
-    }
-
-    val properties = Properties()
-    propertiesFile.inputStream().use { properties.load(it) }
-
-    val major = properties.getProperty("majorEgkAndroid", "0")
-    val minor = properties.getProperty("minorEgkAndroid", "0")
-    val patch = properties.getProperty("patchEgkAndroid", "0")
-
-    return "$major.$minor.$patch"
 }

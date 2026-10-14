@@ -1,7 +1,6 @@
 package de.ehex.settings
 
 import org.gradle.api.Project
-import java.io.File
 
 private fun Project.requiredStringProperty(name: String): String =
     findProperty(name)?.toString() ?: error("Missing Gradle property: $name")
@@ -15,24 +14,6 @@ fun Project.currentBuildNumber(): String =
 
 fun Project.egkLibraryPackageName(): String = requiredStringProperty("libraryPackageNameEgkAndroid")
 
-fun Project.egkLibraryVersion(): String {
-    val base = listOf(
-        requiredStringProperty("majorEgkAndroid"),
-        requiredStringProperty("minorEgkAndroid"),
-        requiredStringProperty("patchEgkAndroid"),
-    ).joinToString(".")
-    val preRelease = optionalStringProperty("preReleaseEgkAndroid")?.takeIf { it.isNotBlank() }
-    return if (preRelease != null) "$base-$preRelease" else base
-}
+fun Project.egkLibraryVersion(): String = requiredStringProperty("sdkVersion")
 
 fun Project.optionalStringProperty(name: String): String? = findProperty(name)?.toString()
-
-fun Project.isSnapshotArtifactBuild(): Boolean {
-    val aarDir = File("${layout.buildDirectory.get()}/outputs/aar")
-    if (!aarDir.exists() || !aarDir.isDirectory) {
-        return false
-    }
-
-    val files = aarDir.listFiles { _, fileName -> fileName.endsWith("SNAPSHOT.aar") }
-    return files?.isNotEmpty() ?: false
-}

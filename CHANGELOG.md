@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The `## [<version>]` section becomes the GitHub release notes; see [RELEASING.md](https://github.com/Link4Health/link4health-sdk-android-framework/blob/main/RELEASING.md).
+
+## [Unreleased]
+
+### Changed
+
+- Version is `sdkVersion` (shared with the SDK and demo app) instead of `majorEgkAndroid`/`minorEgkAndroid`/`patchEgkAndroid`; released by tag via `release.yml`. `RELEASENOTES.md` is replaced by this changelog.
 
 ## [4.0.1] - 2026-10-01
 
