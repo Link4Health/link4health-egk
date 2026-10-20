@@ -8,6 +8,8 @@ The `## [<version>]` section becomes the GitHub release notes; see [RELEASING.md
 
 ## [Unreleased]
 
+## [4.0.2-beta] - 2026-10-20
+
 ### Changed
 
 - Version is `sdkVersion` (shared with the SDK and demo app) instead of `majorEgkAndroid`/`minorEgkAndroid`/`patchEgkAndroid`; released by tag via `release.yml`. `RELEASENOTES.md` is replaced by this changelog.
