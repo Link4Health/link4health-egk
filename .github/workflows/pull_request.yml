@@ -4,8 +4,6 @@ on:
   pull_request:
     branches:
       - main
-      - develop
-      - release
   workflow_dispatch:
 
 jobs:
@@ -15,6 +13,8 @@ jobs:
     steps:
       - name: Checkout EGK
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: grant execute permission for gradlew
         run: chmod +x gradlew

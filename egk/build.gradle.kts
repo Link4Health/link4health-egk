@@ -2,7 +2,6 @@ import de.ehex.settings.currentBuildNumber
 import de.ehex.settings.egkLibraryPackageName
 import de.ehex.settings.egkLibraryVersion
 import de.ehex.settings.getGitHash
-import de.ehex.settings.isSnapshotArtifactBuild
 import de.ehex.settings.nameSpace
 import de.ehex.settings.optionalStringProperty
 import de.ehex.settings.registerDocumentationTasks
@@ -280,14 +279,9 @@ afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>("Link4HealthEgkLibrary") {
-                val libraryVersionEgk = project.egkLibraryVersion()
                 groupId = project.egkLibraryPackageName()
                 artifactId = "${rootProject.name}-library"
-                version = if (project.isSnapshotArtifactBuild()) {
-                    "$libraryVersionEgk-${project.currentBuildNumber()}-SNAPSHOT"
-                } else {
-                    libraryVersionEgk
-                }
+                version = project.egkLibraryVersion()
                 from(components["release"])
                 artifact(tasks.named("dokkaJavadocJar"))
                 artifact(tasks.named("dokkaHtmlJar"))
