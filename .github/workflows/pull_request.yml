@@ -50,7 +50,6 @@ jobs:
       - name: Create gradle.properties
         run: |
           mkdir -p ~/.gradle
-          echo "nvdApiKey=${{ secrets.NVD_API_KEY }}" >> ~/.gradle/gradle.properties
           echo "org.gradle.internal.publish.checksums.insecure=true" >> ~/.gradle/gradle.properties
 
       - name: Run tests
